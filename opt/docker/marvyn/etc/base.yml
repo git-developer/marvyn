@@ -1,0 +1,18 @@
+---
+version: "2.2"
+services:
+  marvyn-base:
+    image: ckware/marvyn:ubuntu
+    init: true
+    cpu_shares: 512
+    volumes:
+      - ../data:/home/marvyn
+      - ../output:/output
+    environment:
+      - HOME=/home/marvyn
+      - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
+      - FAKETIME
+      - TZ
+      - MARVYN_MAKEMKV_BETAKEY_URL=https://www.makemkv.com/forum/viewtopic.php?f=5&t=1053
+      - MARVYN_MAKEMKV_BETAKEY_PATTERN=(?<=<code>)[^<]+(?=</code>)
+      - MARVYN_MAKEMKV_KEY

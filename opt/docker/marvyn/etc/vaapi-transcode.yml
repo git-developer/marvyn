@@ -1,0 +1,20 @@
+---
+version: "2.2"
+services:
+  marvyn-vaapi-transcode:
+    extends:
+      file: base.yml
+      service: marvyn-base
+    environment:
+      - MARVYN_VIDEO_BITRATE=1280k
+      - MARVYN_VIDEO_CODEC=h264_vaapi
+      - MARVYN_VIDEO_WIDTH=720
+      - MARVYN_AUDIO_BITRATE=128k
+      - MARVYN_AUDIO_CODEC=aac
+      - MARVYN_AUDIO_CHANNELS=2
+      - MARVYN_AUDIO_LANGUAGES=deu,ger,eng
+      - MARVYN_VAAPI_DEVICE=/dev/dri/renderD128
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    group_add:
+      - video

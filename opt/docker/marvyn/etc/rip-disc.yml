@@ -1,0 +1,26 @@
+---
+version: "2.2"
+services:
+  maryn-rip-disc:
+    extends:
+      file: base.yml
+      service: maryn-base
+    hostname: maryn
+    env_file:
+      - mail.env
+    environment:
+      - ID_CDROM_MEDIA_CD
+      - ID_CDROM_MEDIA_CD_R
+      - ID_CDROM_MEDIA_DVD
+      - ID_CDROM_MEDIA_BD
+      - ID_FS_LABEL
+      - MARVYN_CD_TITLE_DEPTH=3
+    devices:
+      - /dev/cdrom:/dev/cdrom
+      - /dev/dvd:/dev/dvd
+      - /dev/sg1:/dev/sg1
+      - /dev/sr0:/dev/sr0
+    group_add:
+      - cdrom
+    cap_add:
+      - SYS_RAWIO

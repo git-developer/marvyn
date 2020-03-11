@@ -1,0 +1,25 @@
+MakeMKV hashed keys:
+  url: https://www.makemkv.com/forum/viewtopic.php?f=12&t=16959
+  filename: $HOME/.MakeMKV/keys_hashed.txt
+
+FindVUK AACS keys:
+  url: http://fvonline-db.bplaced.net/
+  filenames:
+  - $HOME/.MakeMKV/KEYDB.cfg
+  - $HOME/.config/aacs/KEYDB.cfg
+
+Device keys, processing keys, host certificates:
+  url: https://forum.doom9.org/showthread.php?p=1883655
+  filenames:
+  - $HOME/.MakeMKV/KEYDB.cfg
+  - $HOME/.config/aacs/KEYDB.cfg
+
+BD+ vm files:
+  url: https://forum.doom9.org/showthread.php?t=176924
+  filenames:
+  - $HOME/.config/bdplus/vm0/
+
+BD+ cached tables:
+  url: https://forum.doom9.org/showthread.php?t=176924
+  filenames:
+  - $HOME/.cache/bdplus/convtab/

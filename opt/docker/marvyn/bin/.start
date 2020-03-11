@@ -1,0 +1,75 @@
+#!/bin/sh
+set -eu
+
+log() {
+  >&2 echo "${@}"
+}
+
+cancel() {
+  log "${@}"
+  return 1
+}
+
+now=$(date +%Y%m%d-%H%M%S)
+user="${USER_ID:-$(id -u)}:${GROUP_ID:-$(id -g)}"
+env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
+
+home_dir="$(realpath "$(dirname "${0}")/..")"
+script_dir_host="${home_dir}/services"
+script_dir_container='/opt/marvyn'
+script_name="$(basename ${0})"
+compose_file="${home_dir}/etc/${script_name}.yml"
+service_name="marvyn-${script_name}"
+container_name="${service_name}-${now}"
+
+input_basedir_container='/input'
+if [ -n "${1-}" ]; then
+  input_fullpath_host=$(realpath "${1}")
+  [ -e "${input_fullpath_host}" ] || cancel "Error: input '${1}' does not exist."
+  input_host=$(dirname  "${input_fullpath_host}")
+  input_filename=$(    basename "${input_fullpath_host}")
+  input_fullpath_container="${input_basedir_container}/${input_filename}"
+fi
+
+output_basedir_container='/output'
+if [ -n "${2-}" ]; then
+  output_fullpath_host="$(realpath -m "${2}")"
+  output_basedir_host=$(dirname  "${output_fullpath_host}")
+  output_filename=$(    basename "${output_fullpath_host}")
+  if [ -d "${input_fullpath_host}" ]; then
+    output_host="${output_fullpath_host}"
+    output_fullpath_container="${output_basedir_container}"
+  elif [ -f "${input_fullpath_host}" ]; then
+    output_host="${output_basedir_host}"
+    output_fullpath_container="${output_basedir_container}/${output_filename}"
+  fi
+  # create output directory with user permissions
+  mkdir -p "${output_host}"
+else
+  output_fullpath_container="${output_basedir_container}${input_filename:+/${input_filename}}"
+fi
+
+work_basedir_container='/work'
+if [ -n "${3-}" ]; then
+  work_host="$(realpath -m "${3}")"
+  work_fullpath_container="${work_basedir_container}"
+  # create work directory with user permissions
+  mkdir -p "${work_host}"
+else
+  work_fullpath_container="${work_basedir_container}/${input_filename:+/${input_filename}}"
+fi
+
+exec docker-compose "--file=${compose_file}" run \
+  "--name=${container_name}" \
+  "--user=${user}" \
+  "--detach" \
+  "--volume=${script_dir_host}:${script_dir_container}:ro" \
+  ${input_host:+"--volume=${input_host}:${input_basedir_container}:ro"} \
+  ${output_host:+"--volume=${output_host}:${output_basedir_container}:rw"} \
+  ${work_host:+"--volume=${work_host}:${work_basedir_container}:rw"} \
+  ${env_variables:+${env_variables}} \
+  "${service_name}" \
+  "${script_dir_container}/${script_name}" \
+  ${input_fullpath_container:+"${input_fullpath_container}"} \
+  ${output_fullpath_container:+"${output_fullpath_container}"} \
+  ${work_fullpath_container:+"${work_fullpath_container}"}

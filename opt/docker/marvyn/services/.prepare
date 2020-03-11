@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+log() {
+  >&2 echo "${@}"
+}
+
+cancel() {
+  log "${@}"
+  return 1
+}
+
+if [ -n "${1-}" ]; then
+  input_fullpath=$(realpath "${1}")
+  input_filename=$(basename "${input_fullpath}")
+  if [ -d "${input_fullpath}/VIDEO_TS" ]; then
+    input_fullpath="${input_fullpath}/VIDEO_TS"
+  fi
+fi
+
+if [ -n "${2-}" ]; then
+  output_fullpath="$(realpath -m "${2}")"
+fi
+
+if [ -n "${3-}" ]; then
+  work_fullpath="$(realpath -m "${3}")"
+fi

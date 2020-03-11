@@ -1,0 +1,29 @@
+#!/bin/sh
+here="$(dirname ${0})"
+. "${here}/.prepare"
+
+if [ -z "${1-}" ] || [ ! -d "${1}" ] || [ -z "${2-}" ] || [ -z "${3-}" ]; then
+  cancel "Syntax: $(basename $0) <input-directory> <output-directory> <work-directory>"
+fi
+mkdir -p "${output_fullpath}"
+if [ ! -d "${work_fullpath}" ]; then
+  mkdir -p "${work_fullpath}"
+  remove_work_directory='true'
+fi
+
+"${here}/remux-directory" "${input_fullpath}" "${work_fullpath}"
+find "${work_fullpath}" -mindepth 1 -maxdepth 1 | while IFS= read -r work_file; do {
+  output_file="${output_fullpath}/"$(basename "${work_file}")
+  "${here}/vaapi-transcode" "${work_file}" "${output_file}"
+  if [ "${MARVYN_CLEANUP:-yes}" = 'yes' ]; then
+    [ ! -f "${work_file}" ] || [ ! -s "${output_file}" ] || rm "${work_file}"
+  fi
+
+  # stdin must be redirected from /dev/null because otherwise the transcoding process
+  # consumes the output of 'find', and the loop terminates after the first call
+  # see https://stackoverflow.com/questions/13800225/
+} </dev/null; done
+
+if [ "${remove_work_directory:-}" = 'true' ]; then
+  rmdir "${work_fullpath}"
+fi

@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+# Patch for abcde bug #107 ( https://abcde.einval.com/bugzilla/show_bug.cgi?id=107 )
+# which prevents special characters in format strings (e.g. round brackets)
+
+source='/usr/bin/abcde'
+suffix='.original'
+
+echo "Patching ${source}"
+sed "--in-place=${suffix}" -E 's/(\$\(eval\s+echo\s+)("?[^"\\-][A-Z_\{\}]+"?)(\))/\1\\"\2\\"\3/g' "${source}"
+
+{ diff "${source}${suffix}" "${source}" >/dev/null; result="$?"; } || true
+if [ "${result}" -eq 0 ]; then
+  >&2 echo "Error:\n" \
+         "  The patch did not change anything.\n" \
+         "  Maybe the source is already fixed, in this case this patch is obsolete."
+  return 1
+elif [ "${result}" -ne 1 ]; then
+  >&2 echo "Error: Comparison of '${source}${suffix}' with '${source}' returned exit code ${result}."
+  return "${result}"
+fi

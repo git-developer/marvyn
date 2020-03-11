@@ -1,0 +1,7 @@
+---
+version: "2.2"
+services:
+  marvyn-transcode-series-directory:
+    extends:
+      file: transcode-disc-directory.yml
+      service: marvyn-transcode-disc-directory

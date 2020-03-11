@@ -1,0 +1,10 @@
+#!/bin/sh
+here="$(dirname ${0})"
+. "${here}/.prepare"
+
+if [ -z "${1-}" ] || [ ! -d "${1}" ] || [ -z "${2-}" ]; then
+  cancel "Syntax: $(basename $0) <input-directory> <output-directory>"
+fi
+mkdir -p "${output_fullpath}"
+
+exec "${here}/makemkvcon" mkv "file:${input_fullpath}" all "${output_fullpath}"

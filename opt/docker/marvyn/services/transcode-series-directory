@@ -1,0 +1,21 @@
+#!/bin/sh
+here="$(dirname ${0})"
+. "${here}/.prepare"
+
+if [ -z "${1-}" ] || [ ! -d "${1}" ] || [ -z "${2-}" ] || [ -z "${3-}" ]; then
+  cancel "Syntax: $(basename $0) <input-directory> <output-directory> <work-directory>"
+fi
+mkdir -p "${output_fullpath}"
+if [ ! -d "${work_fullpath}" ]; then
+  mkdir -p "${work_fullpath}"
+  remove_work_directory='true'
+fi
+
+find "${input_fullpath}" -mindepth 1 -maxdepth 1 -type d | while IFS= read -r input_directory; do
+  name=$(basename "${input_directory}")
+  "${here}/transcode-disc-directory" "${input_directory}" "${output_fullpath}/${name}" "${work_fullpath}/${name}"
+done
+
+if [ "${remove_work_directory:-}" = 'true' ]; then
+  rmdir "${work_fullpath}"
+fi

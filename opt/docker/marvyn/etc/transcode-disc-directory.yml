@@ -1,0 +1,11 @@
+---
+version: "2.2"
+services:
+  marvyn-transcode-disc-directory:
+    extends:
+      file: vaapi-transcode.yml
+      service: marvyn-vaapi-transcode
+    environment:
+      - MARVYN_CLEANUP
+    volumes:
+      - ../work:/work

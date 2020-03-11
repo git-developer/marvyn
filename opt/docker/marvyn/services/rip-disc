@@ -1,0 +1,160 @@
+#!/bin/sh
+#
+# If a disc is in the drive, rip it and notify per mail when finished.
+#
+
+log() {
+  >&2 echo "${@}"
+}
+
+prepare_child_process() {
+    unset term_child_pid
+    unset term_kill_needed
+    trap 'handle_term' TERM INT
+}
+
+handle_term() {
+    if [ "${term_child_pid}" ]; then
+        kill -TERM "${term_child_pid}" 2>/dev/null
+    else
+        term_kill_needed="yes"
+    fi
+}
+
+wait_for_child_process() {
+    term_child_pid="$!"
+    if [ "${term_kill_needed}" ]; then
+        kill -TERM "${term_child_pid}" 2>/dev/null
+    fi
+    wait "${term_child_pid}"
+    trap - TERM INT
+    wait "${term_child_pid}"
+}
+
+
+###############################################################################
+# Detect and log which medium is in the disc drive.
+#
+# Globals:
+#   ID_CDROM_MEDIA_*
+#   ID_FS_LABEL
+# Arguments:
+#   None
+# Returns:
+#   ID for the medium: one of ['CD','CD-R','DVD','BD']
+###############################################################################
+find_medium_type() {
+  # for a list of possible variables, see
+  # https://github.com/systemd/systemd/blob/master/src/udev/cdrom_id/cdrom_id.c
+  if   [ "${ID_CDROM_MEDIA_CD}"   = "1" ]; then
+    medium_type='CD'
+  elif [ "${ID_CDROM_MEDIA_CD_R}" = "1" ]; then
+   medium_type='CD-R'
+  elif [ "${ID_CDROM_MEDIA_DVD}"  = "1" ]; then
+    medium_type='DVD'
+  elif [ "${ID_CDROM_MEDIA_BD}"   = "1" ]; then
+   medium_type='BD'
+  fi
+
+  if [ "${medium_type}" ]; then
+    if [ "${ID_FS_LABEL}" ]; then
+      message="The ${medium_type} '${ID_FS_LABEL}'"
+    else
+      message="A ${medium_type}"
+    fi
+    message="${message} was detected."
+  else
+    message="The disc was ejected or an unsupported disc was inserted."
+  fi
+  log "${message}"
+  echo "${medium_type}"
+}
+
+
+###############################################################################
+#
+# Starts a command that copies a disc and sends its log per mail
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   1 - target: Target directory where the disc is written to
+#   2 - depth: Starting at the target directory and descending ${depth} levels
+#              gives the directory whose name is the title of the disc
+#   3..* - command and arguments
+# Returns:
+#   None
+#
+###############################################################################
+rip_disc() {
+  export logfile=/tmp/rip-disc.log
+  target="${1}" && shift
+  depth="${1}" && shift
+
+  # synchronous calls do not support sending a mail when the child process is terminated:
+  #  sh (problem: when a TERM signal is sent, the return code gets lost)
+  #   return_code=$({ { "${@}" 2>&1; echo "$?" >&2; } | tee "${logfile}"; } 3>&2 2>&1 1>&3)
+  #  bash without signal propagation (problem: shell is terminated, following commands will not be run)
+  #   command="${@} | tee '${logfile}'"
+  #   bash -o pipefail -c "${command}";
+  #   return_code="$?"
+
+  # asynchronous call: mail is sent even on termination of child process
+  prepare_child_process
+  command="${@} 2>&1 | tee ${logfile}"
+  bash -o pipefail -c "${command}" &
+  wait_for_child_process
+  return_code="$?"
+
+  if [ "${return_code}" -eq 0 ]; then result="Erfolg"; else result="Fehler ${return_code}"; fi
+  if [ -d "${target}" ]; then
+    disc_dir=$(find "${target}" -mindepth "${depth}" -maxdepth "${depth}" -printf '%f\n' | uniq | tr -d '\n')
+    title="${disc_dir##${target}/}"
+  fi
+  message="Kopie von '${title:-unbekannt}' mit ${result} beendet."
+  log "${message}"
+
+  if [ "${MARVYN_MAIL_RECIPIENT}" ]; then
+   [ -f "${logfile}" ] || touch "${logfile}"
+   <"${logfile}" sendemail -q -u "${message}" \
+     -f "${MARVYN_MAIL_SENDER}" \
+     -t "${MARVYN_MAIL_RECIPIENT}" \
+     -s "${MARVYN_MAIL_SERVER}" \
+     -xu "${MARVYN_MAIL_USER}" \
+     -xp "${MARVYN_MAIL_PASSWORD}"
+  fi
+}
+
+###############################################################################
+# Main logic: if a disc is present in drive, rip it.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+###############################################################################
+main() {
+  medium_type=$(find_medium_type)
+  target="/output/${medium_type}/${ID_FS_LABEL}"
+  mkdir -p "${target}"
+  cd "${target}"
+  case "${medium_type}" in
+    CD)
+      rip_disc "${target}" "${MARVYN_CD_TITLE_DEPTH:-1}" abcde -N -d /dev/cdrom
+      ;;
+    DVD)
+      rip_disc "${target}" 1 dvdbackup -M
+      ;;
+    BD)
+      rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt disc:0 "${target}"
+      ;;
+    *)
+      log "No action taken."
+      ;;
+  esac
+}
+
+main

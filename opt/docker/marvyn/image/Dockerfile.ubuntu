@@ -1,0 +1,51 @@
+ARG SOURCE=ubuntu:18.04
+ARG MAKEMKV_VERSION=1.15.0
+ARG MAKEMKV_DIR=/tmp/makemkv
+ARG LIBDVD_DIR=/tmp/libdvd-pkg
+ARG DEBIAN_FRONTEND=noninteractive
+
+FROM ${SOURCE} AS libdvd
+ARG DEBIAN_FRONTEND
+ARG LIBDVD_DIR
+WORKDIR ${LIBDVD_DIR}
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+      libdvd-pkg equivs && \
+    dpkg-reconfigure -f noninteractive libdvd-pkg && \
+    equivs-control libdvd-pkg && \
+    version=$(apt-cache policy libdvd-pkg | grep 'Candidate:' | cut -c 14-) && \
+    sed -i "s/Standards-Version:.*/Version: ${version}/g" libdvd-pkg && \
+    sed -i "s/Package:.*/Package: libdvd-pkg/g" libdvd-pkg && \
+    equivs-build libdvd-pkg && \
+    mv /usr/src/libdvd-pkg/libdvdcss2_*.deb "${LIBDVD_DIR}"
+
+FROM libdvd AS makemkv
+ARG MAKEMKV_VERSION
+ARG MAKEMKV_DIR
+WORKDIR /tmp
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+      make g++ gcc pkg-config libavcodec-dev libexpat-dev libssl-dev zlib1g-dev wget ca-certificates && \
+    wget -q -O- "https://www.makemkv.com/download/makemkv-oss-${MAKEMKV_VERSION}.tar.gz" | tar -xz --strip-components=1 --one-top-level=makemkv-oss && \
+    wget -q -O- "https://www.makemkv.com/download/makemkv-bin-${MAKEMKV_VERSION}.tar.gz" | tar -xz --strip-components=1 --one-top-level=makemkv-bin && \
+    cd makemkv-oss && ./configure --disable-gui --prefix="${MAKEMKV_DIR}" -q && \
+    make -s -j "$(nproc)" PREFIX="${MAKEMKV_DIR}" && make install PREFIX="${MAKEMKV_DIR}" && cd .. && \
+    cd makemkv-bin && mkdir -p tmp && touch tmp/eula_accepted && \
+    make -s -j "$(nproc)" PREFIX="${MAKEMKV_DIR}" && make install PREFIX="${MAKEMKV_DIR}"
+
+FROM ${SOURCE}
+ARG LIBDVD_DIR
+ARG MAKEMKV_DIR
+ARG DEBIAN_FRONTEND
+COPY --from=libdvd "${LIBDVD_DIR}/" /tmp/libdvd/
+RUN dpkg -i /tmp/libdvd/libdvd-pkg_*.deb /tmp/libdvd/libdvdcss2_*.deb && apt-mark hold libdvd-pkg && rm -r /tmp/libdvd/
+COPY --from=makemkv ${MAKEMKV_DIR} /usr/local/
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+      tzdata \
+      '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
+      dvdbackup \
+      abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
+      ffmpeg libva-drm2 libva2 i965-va-driver \
+      sendemail libio-socket-ssl-perl
+COPY ./patch-abcde /tmp/patch-abcde
+RUN /tmp/patch-abcde && rm /tmp/patch-abcde
+VOLUME /opt/marvyn/
+ENTRYPOINT exec nice ${MARVYN_NICENESS:+-n "${MARVYN_NICENESS}"} "${0}" "${@}"

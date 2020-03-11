@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+set -eu
+
+settings_dir="${HOME}/.MakeMKV"
+settings_file="${settings_dir}/settings.conf"
+property='^\s*app_Key.*$'
+
+if [ -z "${MARVYN_MAKEMKV_KEY-}" ]; then
+  if [ -n "${MARVYN_MAKEMKV_BETAKEY_URL-}" -a -n "${MARVYN_MAKEMKV_BETAKEY_PATTERN-}" ]; then
+    MARVYN_MAKEMKV_KEY="$(curl -sSL "${MARVYN_MAKEMKV_BETAKEY_URL}" | grep -oP "${MARVYN_MAKEMKV_BETAKEY_PATTERN}" || true)"
+  fi
+fi
+
+if [ "${MARVYN_MAKEMKV_KEY}" ]; then
+  [ -d "${settings_dir}" ] || mkdir -p "${settings_dir}"
+  if [ ! -f "${settings_file}" ] || ! grep "${property}" "${settings_file}"; then
+    echo "app_Key = ${MARVYN_MAKEMKV_KEY}" >>"${settings_file}"
+  else
+    sed -i "s/${property}/app_Key = ${MARVYN_MAKEMKV_KEY}/g" "${settings_file}"
+  fi
+fi
+
+exec makemkvcon "${@}"
