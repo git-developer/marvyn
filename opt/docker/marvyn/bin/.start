@@ -12,7 +12,6 @@ cancel() {
 
 now=$(date +%Y%m%d-%H%M%S)
 user="${USER_ID:-$(id -u)}:${GROUP_ID:-$(id -g)}"
-env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
 
 home_dir="$(realpath "$(dirname "${0}")/..")"
 script_dir_host="${home_dir}/services"
@@ -29,6 +28,7 @@ if [ -n "${1-}" ]; then
   input_host=$(dirname  "${input_fullpath_host}")
   input_filename=$(    basename "${input_fullpath_host}")
   input_fullpath_container="${input_basedir_container}/${input_filename}"
+  export MARVYN_INPUT_INODE=$(stat -c %i "${input_host}")
 fi
 
 output_basedir_container='/output'
@@ -45,6 +45,7 @@ if [ -n "${2-}" ]; then
   fi
   # create output directory with user permissions
   mkdir -p "${output_host}"
+  export MARVYN_OUTPUT_INODE=$(stat -c %i "${output_host}")
 else
   output_fullpath_container="${output_basedir_container}${input_filename:+/${input_filename}}"
 fi
@@ -55,9 +56,12 @@ if [ -n "${3-}" ]; then
   work_fullpath_container="${work_basedir_container}"
   # create work directory with user permissions
   mkdir -p "${work_host}"
+  export MARVYN_WORK_INODE=$(stat -c %i "${work_host}")
 else
   work_fullpath_container="${work_basedir_container}/${input_filename:+/${input_filename}}"
 fi
+
+env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
 
 exec docker-compose "--file=${compose_file}" run \
   "--name=${container_name}" \
