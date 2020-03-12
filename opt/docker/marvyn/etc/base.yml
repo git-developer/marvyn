@@ -6,6 +6,7 @@ services:
     init: true
     cpu_shares: 512
     volumes:
+      - ../services:/opt/marvyn:ro
       - ../data:/home/marvyn
       - ../output:/output
     environment:

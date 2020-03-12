@@ -67,7 +67,6 @@ exec docker-compose "--file=${compose_file}" run \
   "--name=${container_name}" \
   "--user=${user}" \
   "--detach" \
-  "--volume=${script_dir_host}:${script_dir_container}:ro" \
   ${input_host:+"--volume=${input_host}:${input_basedir_container}:ro"} \
   ${output_host:+"--volume=${output_host}:${output_basedir_container}:rw"} \
   ${work_host:+"--volume=${work_host}:${work_basedir_container}:rw"} \
