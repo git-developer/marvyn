@@ -1,1 +1,1 @@
-ACTION=="change", SUBSYSTEMS=="block", KERNEL=="s[rg][0-9]*", ENV{ID_CDROM}=="?*", RUN+="/opt/docker/marvyn/rip-disc"
+ACTION=="change", SUBSYSTEMS=="block", KERNEL=="s[rg][0-9]*", ENV{ID_CDROM}=="?*", RUN+="/opt/docker/marvyn/bin/rip-disc"

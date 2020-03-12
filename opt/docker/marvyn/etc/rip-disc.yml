@@ -1,11 +1,11 @@
 ---
 version: "2.2"
 services:
-  maryn-rip-disc:
+  marvyn-rip-disc:
     extends:
       file: base.yml
-      service: maryn-base
-    hostname: maryn
+      service: marvyn-base
+    hostname: marvyn
     env_file:
       - mail.env
     environment:
