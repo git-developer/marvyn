@@ -63,7 +63,12 @@ fi
 
 env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
 
-exec docker-compose "--file=${compose_file}" run \
+# docker-compose fails when called from 'exec' in an udev environment:
+# PATH is not set, no surrounding shell is available and docker-compose tries to fork itself,
+# but does not know its path. Workaround: call docker-compose from absolute path
+docker_compose="$(command -v docker-compose)" || cancel 'Error: docker-compose is missing.'
+
+exec "${docker_compose}" "--file=${compose_file}" run \
   "--name=${container_name}" \
   "--user=${user}" \
   "--detach" \
