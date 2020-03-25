@@ -61,6 +61,7 @@ else
   work_fullpath_container="${work_basedir_container}/${input_filename:+/${input_filename}}"
 fi
 
+# Inject environment variables prefixed with MARVYN_ into the container
 env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
 
 # docker-compose fails when called from 'exec' in an udev environment:

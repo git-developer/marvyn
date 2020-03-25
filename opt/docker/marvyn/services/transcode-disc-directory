@@ -18,10 +18,7 @@ find "${work_fullpath}" -mindepth 1 -maxdepth 1 | while IFS= read -r work_file; 
   if [ "${MARVYN_CLEANUP:-yes}" = 'yes' ]; then
     [ ! -f "${work_file}" ] || [ ! -s "${output_file}" ] || rm "${work_file}"
   fi
-
-  # stdin must be redirected from /dev/null because otherwise the transcoding process
-  # consumes the output of 'find', and the loop terminates after the first call
-  # see https://stackoverflow.com/questions/13800225/
+# redirect input from '/dev/null' so that vaapi-transcode does not consume the loop's input
 } </dev/null; done
 
 if [ "${remove_work_directory:-}" = 'true' ]; then

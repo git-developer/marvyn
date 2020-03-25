@@ -1,7 +1,4 @@
 #!/bin/sh
-#
-# If a disc is in the drive, rip it and notify per mail when finished.
-#
 
 log() {
   >&2 echo "${@}"
@@ -31,18 +28,6 @@ wait_for_child_process() {
     wait "${term_child_pid}"
 }
 
-
-###############################################################################
-# Detect and log which medium is in the disc drive.
-#
-# Globals:
-#   ID_CDROM_MEDIA_*
-#   ID_FS_LABEL
-# Arguments:
-#   None
-# Returns:
-#   ID for the medium: one of ['CD','CD-R','DVD','BD']
-###############################################################################
 find_medium_type() {
   # for a list of possible variables, see
   # https://github.com/systemd/systemd/blob/master/src/udev/cdrom_id/cdrom_id.c
@@ -70,23 +55,6 @@ find_medium_type() {
   echo "${medium_type}"
 }
 
-
-###############################################################################
-#
-# Starts a command that copies a disc and sends its log per mail
-#
-# Globals:
-#   None
-#
-# Arguments:
-#   1 - target: Target directory where the disc is written to
-#   2 - depth: Starting at the target directory and descending ${depth} levels
-#              gives the directory whose name is the title of the disc
-#   3..* - command and arguments
-# Returns:
-#   None
-#
-###############################################################################
 rip_disc() {
   export logfile=/tmp/rip-disc.log
   target="${1}" && shift
@@ -126,16 +94,6 @@ rip_disc() {
   fi
 }
 
-###############################################################################
-# Main logic: if a disc is present in drive, rip it.
-#
-# Globals:
-#   None
-# Arguments:
-#   None
-# Returns:
-#   None
-###############################################################################
 main() {
   medium_type=$(find_medium_type)
   target="/output/${medium_type}/${ID_FS_LABEL}"

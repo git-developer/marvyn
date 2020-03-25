@@ -12,4 +12,5 @@ find "${input_fullpath}" -type f ! -name "*.jpg" | while IFS= read -r input_file
   output_file="${output_fullpath}/${filepath%.*}.${MARVYN_FFMPEG_OUTPUT_FORMAT:-mp3}"
   mkdir -p "$(dirname "${output_file}")"
   ffmpeg -i "${input_file}" ${MARVYN_FFMPEG_OUTPUT_OPTIONS:+${MARVYN_FFMPEG_OUTPUT_OPTIONS}} "${output_file}"
+# redirect input from '/dev/null' so that ffmpeg does not consume the loop's input
 } </dev/null; done
