@@ -26,8 +26,11 @@ The ARM platform (eg. Raspberry Pi) is not supported as long as
 
 
 ## Installation
-* Download: `mkdir -p /opt/docker && cd /opt/docker && git clone https://github.com/git-developer/marvyn`
-* Create Docker image: `docker build -t ckware/marvyn /opt/docker/marvyn/image/`
+* Download, e.g.
+    * `$ git clone --depth 1 https://github.com/git-developer/marvyn`
+    * `$ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/`
+* Create Docker image:
+    * `$ docker build -t ckware/marvyn /opt/docker/marvyn/image/`
 
 
 ## Usage
@@ -81,13 +84,14 @@ Video conversion uses hardware transcoding.
 ### General
 File: `etc/base.yml`
 
-Option | Description | Examples | Default
-Volume Mount `/output` | Output directory | `/media/newstuff:/output` | `../output:/output`
-Environment variable `MARVYN_MAKEMKV_KEY` | MakeMKV [registration key](https://www.makemkv.com/buy/). When unset, a beta key is downloaded and used.  | `T-wN2...AE5z` | _none_
-Environment variable `MARVYN_NICENESS` | CPU priority | `-19`..`20` | _none_ (effectively: Default of `nice` command)
-Environment variable `TZ` | Timezone | `Europe/Berlin` | _none_
-Environment variable `FAKETIME` | System time that is used. Allows to circumvent expiration issues. See [libfaketime](https://github.com/wolfcw/libfaketime) for format specification an details. | `-14d`, `2020-12-24 20:30:00` | _none_
-Service Option `cpu_shares` | CPU priority. See [CPU share constraint](https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources#cpu-share-constraint) for details. | `512` | `512`
+| Option | Description | Examples | Default |
+| -----  | ----------- | -------- | ------- |
+| Volume Mount `/output` | Output directory | `/media/newstuff:/output` | `../output:/output` |
+| Environment variable `MARVYN_MAKEMKV_KEY` | MakeMKV [registration key](https://www.makemkv.com/buy/). When unset, a beta key is downloaded and used.  | `T-wN2...AE5z` | _none_ |
+| Environment variable `MARVYN_NICENESS` | CPU priority | `-19`..`20` | _none_ (effectively: Default of `nice` command)
+| Environment variable `TZ` | Timezone | `Europe/Berlin` | _none_ |
+| Environment variable `FAKETIME` | System time that is used. Allows to circumvent expiration issues. See [libfaketime](https://github.com/wolfcw/libfaketime) for format specification and details. | `-14d`, `2020-12-24 20:30:00` | _none_ |
+| Service Option `cpu_shares` | CPU priority. See [CPU share constraint](https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources#cpu-share-constraint) for details. | `512` | `512` |
 
 ### Autorip
 * Enable Autorip:
@@ -100,21 +104,23 @@ locations.
 #### Main configuration
 File `etc/rip-disc.yml`
 
-Option | Description | Examples | Default
-Device Options | Available disc drives | `/dev/cdrom:/dev/cdrom` | see `etc/rip-disc.yml`
-Environment variable `MARVYN_CD_TITLE_DEPTH` | Starting in the output directory, how many subdirectories do we have to descend to find the directory containing the CD title? Depends on the number of directories used in `OUTPUTFORMAT` and `VAOUTPUTFORMAT` in `data/.abcde.conf` | `1` | `3`
+| Option | Description | Examples | Default |
+| -----  | ----------- | -------- | ------- |
+| Device Options | Available disc drives | `/dev/cdrom:/dev/cdrom` | see `etc/rip-disc.yml` |
+| Environment variable `MARVYN_CD_TITLE_DEPTH` | Starting in the output directory, how many subdirectories do we have to descend to find the directory containing the CD title? Depends on the number of directories used in `OUTPUTFORMAT` and `VAOUTPUTFORMAT` in `data/.abcde.conf` | `1` | `3` |
 
 #### Mail notification
 File: `etc/mail.env`
 
 Notification mails are sent only when `MARVYN_MAIL_RECIPIENT` is set.
 
-Option | Description | Examples | Default
-`MARVYN_MAIL_SENDER` | Sender address | `marvyn@example.com` | _none_
-`MARVYN_MAIL_RECIPIENT` | Recipient address | `admin@example.com` | _none_
-`MARVYN_MAIL_SERVER` | Mail server and optional port | `mail.example.com:587` | _none_
-`MARVYN_MAIL_USER` | Username for login on mail server | `mailaccount@mail.example.com` | _none_
-`MARVYN_MAIL_PASSWORD` | Password for login on mail server | `p4§§w0rD` | _none_
+| Option | Description | Examples |
+| -----  | ----------- | -------- |
+| `MARVYN_MAIL_SENDER` | Sender address | `marvyn@example.com` |
+| `MARVYN_MAIL_RECIPIENT` | Recipient address | `admin@example.com` |
+| `MARVYN_MAIL_SERVER` | Mail server and optional port | `mail.example.com:587` |
+| `MARVYN_MAIL_USER` | Username for login on mail server | `mailaccount@mail.example.com` |
+| `MARVYN_MAIL_PASSWORD` | Password for login on mail server | `p4§§w0rD` |
 
 #### Audio CD ripping
 File: `data/.abcde.conf`
@@ -124,9 +130,10 @@ File: `data/.abcde.conf`
 ### Video Disc Conversion
 File: `etc/transcode-disc-directory.yml`
 
-Option | Description | Examples | Default
-Volume Mount `/work` | Working directory for temp files | `/tmp/transcoding:/work` | `../work:/work`
-Environment variable `MARVYN_CLEANUP` | Delete temp files after successful finish? | `yes`, `no` | `yes`
+| Option | Description | Examples | Default |
+| -----  | ----------- | -------- | ------- |
+| Volume Mount `/work` | Working directory for temp files | `/tmp/transcoding:/work` | `../work:/work` |
+| Environment variable `MARVYN_CLEANUP` | Delete temp files after successful finish? | `yes`, `no` | `yes` |
 
 This configuration uses the _Video Transcoding_ configuration as default.
 Values in `etc/vaapi-transcode.yml` will be applied to all video transcoding
@@ -136,11 +143,12 @@ tasks, including _Video Disc Conversion_. Values in
 ### Audio Conversion
 File: `etc/transcode-audio-directory.yml`
 
-Option | Description | Examples | Default
-Environment variable `MARVYN_FFMPEG_OUTPUT_FORMAT` | Output format | `mp3`, `ogg` | `mp3`
-Environment variable `MARVYN_FFMPEG_OUTPUT_OPTIONS` | Output options for FFmpeg | see [FFmpeg documentation](https://ffmpeg.org/ffmpeg.html#Options) | `-q 5.5 -id3v2_version 3 -c:v copy`
-Environment variable `MARVYN_AUDIO_EXCLUDES` | Comma-separated list of filenames that are ignored for conversion. Glob expressions are supported. This option has no effect when `MARVYN_AUDIO_INCLUDES` is set. | `*.jpg,*.png,*.txt` | _none_
-Environment variable `MARVYN_AUDIO_INCLUDES` | Comma-separated list of filenames that are considered for conversion. Glob expressions are supported. | `*.flac,*.ogg` | `*.flac,*.ogg,*.mp3`
+| Option | Description | Examples | Default |
+| -----  | ----------- | -------- | ------- |
+| Environment variable `MARVYN_FFMPEG_OUTPUT_FORMAT` | Output format | `mp3`, `ogg` | `mp3` |
+| Environment variable `MARVYN_FFMPEG_OUTPUT_OPTIONS` | Output options for FFmpeg | see [FFmpeg documentation](https://ffmpeg.org/ffmpeg.html#Options) | `-q 5.5 -id3v2_version 3 -c:v copy` |
+| Environment variable `MARVYN_AUDIO_EXCLUDES` | Comma-separated list of filenames that are ignored for conversion. Glob expressions are supported. This option has no effect when `MARVYN_AUDIO_INCLUDES` is set. | `*.jpg,*.png,*.txt` | _none_ |
+| Environment variable `MARVYN_AUDIO_INCLUDES` | Comma-separated list of filenames that are considered for conversion. Glob expressions are supported. | `*.flac,*.ogg` | `*.flac,*.ogg,*.mp3` |
 
 ### Video Series Conversion
 File: `etc/transcode-series-directory.yml`
@@ -157,16 +165,17 @@ File: `etc/remux-directory.yml`
 ### Video Transcoding
 File: `etc/vaapi-transcode.yml`
 
-Option | Description | Examples | Default
-Environment variable `MARVYN_VIDEO_BITRATE` | Video bitrate | `1280k` | `1280k`
-Environment variable `MARVYN_VIDEO_CODEC` | Video format supported by VAAPI | `h264_vaapi` | `h264_vaapi`
-Environment variable `MARVYN_VIDEO_WIDTH` | Video width | `720` | `720`
-Environment variable `MARVYN_AUDIO_BITRATE` | Audio bitrate | `128k` | `128k`
-Environment variable `MARVYN_AUDIO_CODEC` | Audio format | `aac` | `aac`
-Environment variable `MARVYN_AUDIO_CHANNELS` | Audio channels | `2` | `2`
-Environment variable `MARVYN_AUDIO_LANGUAGES` | List of allowed audio languages in descending priority. The first language that is found in the video is selected for output. If the video contains only a single language, that one is used and this setting is ignored. | `deu,ger,eng` | `deu,ger,eng`
-Environment variable `MARVYN_VAAPI_DEVICE` | VAAPI device for hardware transcoding | `/dev/dri/renderD128` | `/dev/dri/renderD128`
-Device Options | Available VAAPI devices | `/dev/dri/renderD128:/dev/dri/renderD128` | `/dev/dri/renderD128:/dev/dri/renderD128`
+| Option | Description | Examples | Default |
+| -----  | ----------- | -------- | ------- |
+| Environment variable `MARVYN_VIDEO_BITRATE` | Video bitrate | `1280k` | `1280k` |
+| Environment variable `MARVYN_VIDEO_CODEC` | Video format supported by VAAPI | `h264_vaapi` | `h264_vaapi` |
+| Environment variable `MARVYN_VIDEO_WIDTH` | Video width | `720` | `720` |
+| Environment variable `MARVYN_AUDIO_BITRATE` | Audio bitrate | `128k` | `128k` |
+| Environment variable `MARVYN_AUDIO_CODEC` | Audio format | `aac` | `aac` |
+| Environment variable `MARVYN_AUDIO_CHANNELS` | Audio channels | `2` | `2` |
+| Environment variable `MARVYN_AUDIO_LANGUAGES` | List of allowed audio languages in descending priority. The first language that is found in the video is selected for output. If the video contains only a single language, that one is used and this setting is ignored. | `deu,ger,eng` | `deu,ger,eng` |
+| Environment variable `MARVYN_VAAPI_DEVICE` | VAAPI device for hardware transcoding | `/dev/dri/renderD128` | `/dev/dri/renderD128` |
+| Device Options | Available VAAPI devices | `/dev/dri/renderD128:/dev/dri/renderD128` | `/dev/dri/renderD128:/dev/dri/renderD128` |
 
 
 ## Advanced Topics
@@ -227,7 +236,7 @@ It contains all configuration and data needed at runtime, e.g.
 * Keys for disc decryption
 
 ### Base image (Linux distribution)
-The default Docker image is based on ubuntu,
+The default Docker image is based on Ubuntu,
 an alternative Docker image based on Debian is available.
 
 ### Ripping of encrypted discs
@@ -250,6 +259,7 @@ MARVYN integrates the following applications and libraries:
 
 ## Examples
 Given the following example directory structure:
+
     ```
      media
      +-inbox
