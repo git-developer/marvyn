@@ -32,12 +32,20 @@ The ARM platform (eg. Raspberry Pi) is not supported as long as
 
 
 ## Installation
-1. Download, e.g.
+1. Download to `/opt/docker/marvyn/`, e.g.
     * `$ git clone --depth 1 https://github.com/git-developer/marvyn`
     * `$ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/`
-1. Create Docker image (this will take a few minutes):
-    * `$ docker build -t ckware/marvyn /opt/docker/marvyn/image/`
-
+1. Create Docker image (this will take a few minutes). Choose one of:
+    * Ubuntu-based (default):
+      ```shell
+      $ docker build -t ckware/marvyn /opt/docker/marvyn/image/
+      ```
+    * Debian-based:
+      ```shell
+      $ docker build -f /opt/docker/marvyn/image/Dockerfile.debian -t ckware/marvyn /opt/docker/marvyn/image/
+      ```
+    You may use a different Docker tag than `ckware/marvyn`;
+    if you decide to do so, set it in `etc/base.yml` accordingly.
 
 ## Usage
 ### Autorip
@@ -241,12 +249,8 @@ By default, the directories for `/output` and `/work` are read from the
 configuration file. Alternatively, it is possible to hand them over as command
 line arguments to a service, e.g.
 
-* ```shell
-  $ bin/transcode-disc-directory /media/input.mp4 /media/output/
-  ```
-* ```shell
-  bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/
-  ```
+* `$ bin/transcode-disc-directory /media/input.mp4 /media/output/`
+* `$ bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/`
 
 Unfortunately, this does not work reliably as long as
 [docker-compose #7270](https://github.com/docker/compose/issues/7270)
