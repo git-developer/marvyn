@@ -19,6 +19,8 @@ MARVYN is nice:
 ## Pre-requisites
 - An x86 compatible linux system with `docker-compose`
 
+The Docker Compose [documentation](https://docs.docker.com/compose/install/)
+contains a comprehensive guide explaining several install options.
 On debian-based systems, `docker-compose` may be installed by calling
 
 ```shell
@@ -104,10 +106,13 @@ Enable Autorip:
 $ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
 ```
 
-Feel free to change the file content if
-* your installation is not located in the default directory `/opt/docker/marvyn`,
-* your disc drives have custom locations or
-* you want Autorip to run with a non-root user.
+You have to to modify the file content only if one or more of the following
+cases apply:
+* MARVYN is not located in the default directory `/opt/docker/marvyn`.
+* Your disc drive is not mounted at the default locations `/dev/sg1` and
+  `/dev/sr0`; you also have to modify `etc/rip-disc.yml` in this case.
+* You want to run Autorip as a non-root user; change the command to
+  `/usr/bin/sudo -E -u <user> /opt/docker/marvyn/bin/rip-disc` in this case.
 
 #### Main configuration
 File `etc/rip-disc.yml`
