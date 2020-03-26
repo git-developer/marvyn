@@ -1,5 +1,5 @@
 # MARVYN
-MARVYN is **M**astering **A**udio, **R**ipping & **V**ideo tasks Eas**y** & **N**ice.
+MARVYN is **M**astering **A**udio, **R**ipping & **V**ideo tasks automaticall**Y** & **N**icely.
 
 
 ## Key features
