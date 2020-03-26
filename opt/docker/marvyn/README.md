@@ -16,6 +16,16 @@ MARVYN is nice:
 - Allows to send a mail notification after a disc is ripped
 - Does not need root permissions
 
+## TL;DR
+* Install:
+  ```shell
+  $ sudo apt install docker-compose
+  $ git clone --depth 1 https://github.com/git-developer/marvyn
+  $ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/
+  $ docker build -t ckware/marvyn /opt/docker/marvyn/image/
+  ```
+* Run: _Insert disc_
+
 ## Pre-requisites
 - An x86 compatible linux system with `docker-compose`
 
