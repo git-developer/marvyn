@@ -2,7 +2,7 @@
 version: "2.2"
 services:
   marvyn-base:
-    image: ckware/marvyn:ubuntu
+    image: ckware/marvyn
     init: true
     cpu_shares: 512
     volumes:
