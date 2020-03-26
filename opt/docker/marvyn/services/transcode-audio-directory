@@ -7,7 +7,14 @@ if [ -z "${1-}" ] || [ ! -d "${1}" ] || [ -z "${2-}" ]; then
 fi
 mkdir -p "${output_fullpath}"
 
-find "${input_fullpath}" -type f ! -name "*.jpg" | while IFS= read -r input_file; do {
+if [ -n "${MARVYN_AUDIO_INCLUDES-}" ]; then
+  for include in $(echo "${MARVYN_AUDIO_INCLUDES}" | tr ',' '\n'); do find_filter="${find_filter:+${find_filter} -o} -name ${include}"; done
+fi
+if [ -n "${MARVYN_AUDIO_EXCLUDES-}" ]; then
+  for exclude in $(echo "${MARVYN_AUDIO_EXCLUDES}" | tr ',' '\n'); do find_filter="${find_filter:+${find_filter} -a} ! -name ${exclude}"; done
+fi
+
+find "${input_fullpath}" -type f ${find_filter:+${find_filter}} | while IFS= read -r input_file; do {
   filepath="${input_file#*${input_fullpath}/}"
   output_file="${output_fullpath}/${filepath%.*}.${MARVYN_FFMPEG_OUTPUT_FORMAT:-mp3}"
   mkdir -p "$(dirname "${output_file}")"

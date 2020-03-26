@@ -139,6 +139,8 @@ File: `etc/transcode-audio-directory.yml`
 Option | Description | Examples | Default
 Environment variable `MARVYN_FFMPEG_OUTPUT_FORMAT` | Output format | `mp3`, `ogg` | `mp3`
 Environment variable `MARVYN_FFMPEG_OUTPUT_OPTIONS` | Output options for FFmpeg | see [FFmpeg documentation](https://ffmpeg.org/ffmpeg.html#Options) | `-q 5.5 -id3v2_version 3 -c:v copy`
+Environment variable `MARVYN_AUDIO_EXCLUDES` | Comma-separated list of filenames that are ignored for conversion. Glob expressions are supported. This option has no effect when `MARVYN_AUDIO_INCLUDES` is set. | `*.jpg,*.png,*.txt` | _none_
+Environment variable `MARVYN_AUDIO_INCLUDES` | Comma-separated list of filenames that are considered for conversion. Glob expressions are supported. | `*.flac,*.ogg` | `*.flac,*.ogg,*.mp3`
 
 ### Video Series Conversion
 File: `etc/transcode-series-directory.yml`
