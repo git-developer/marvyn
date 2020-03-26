@@ -14,22 +14,26 @@ MARVYN is nice:
 - Uses [VAAPI](https://trac.ffmpeg.org/wiki/Hardware/VAAPI) hardware acceleration for video transcoding
 - Runs with low cpu priority
 - Allows to send a mail notification after a disc is ripped
-- Does not need root persmissions
+- Does not need root permissions
 
 ## Pre-requisites
 - An x86 compatible linux system with `docker-compose`
-  On debian-based systems, `docker-compose` may be installed by calling
-  ```$ sudo apt install docker-compose```
+
+On debian-based systems, `docker-compose` may be installed by calling
+
+```shell
+$ sudo apt install docker-compose
+```
 
 The ARM platform (eg. Raspberry Pi) is not supported as long as
 [MakeMKV](https://makemkv.com/) is available for x86 only.
 
 
 ## Installation
-* Download, e.g.
+1. Download, e.g.
     * `$ git clone --depth 1 https://github.com/git-developer/marvyn`
     * `$ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/`
-* Create Docker image:
+1. Create Docker image (this will take a few minutes):
     * `$ docker build -t ckware/marvyn /opt/docker/marvyn/image/`
 
 
@@ -37,17 +41,17 @@ The ARM platform (eg. Raspberry Pi) is not supported as long as
 ### Autorip
 * Insert a Blu-ray, DVD or Audio CD into your drive.
 
-When autorip is enabled (disabled by default), the disc will be automatically
-ripped to your output directory. Copy protection will be removed.
-Audio files will be tagged properly. If mail notification is enabled (disabled
-by default), a mail with a log file will be sent on finish.
+When autorip is enabled (disabled by default), MARVYN will automatically rip the
+disc to your output directory, remove copy protection and tag audio files.
+If mail notification is enabled (disabled by default), MARVYN will send a mail
+with a log file on finish.
 
 ### Video Disc Conversion
 * `bin/transcode-disc-directory <path-to-directory>`
 
 The directory must contain a BD or DVD structure (i.e. `VIDEO_TS` or `BDMV`).
 All videos will be converted to the configured target format (default: h.264)
-containing a single language (default: german) and written to the output
+containing a single language (default: German) and written to the output
 directory as separate files. Video conversion uses hardware transcoding.
 
 ### Audio Conversion
@@ -61,45 +65,49 @@ directory structure and metadata (tags).
 * `bin/transcode-series-directory <path-to-directory>`
 
 The directory is supposed to hold a (TV or movie) series; it must contain
-subdirectories, each holding a BD or DVD structure.
+subdirectories, each holding a Blu-ray or DVD structure.
 Every subdirectory will be converted by the _Video Disc Conversion_.
 
 ### Video Remultiplexing
 * `bin/remux-directory <path-to-directory>`
 
-The directory must contain a BD or DVD structure (i.e. `VIDEO_TS` or `BDMV`).
-Every contained video will be converted to a separate MKV file losslessly
-and written to the output directory.
+The directory must contain a Blu-ray or DVD structure (i.e. `VIDEO_TS` or
+`BDMV`). Every contained video will be converted to a separate MKV file
+losslessly and written to the output directory.
 
 ### Video Transcoding
 * `bin/vaapi-transcode <path-to-video-file>`
 
 The input video will be converted to the configured target format
-(default: h.264) containing a single language (default: german).
+(default: h.264) containing a single language (default: German).
 Video conversion uses hardware transcoding.
 
 
 ## Configuration
 
 ### General
-File: `etc/base.yml`
+* File: `etc/base.yml`
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
 | Volume Mount `/output` | Output directory | `/media/newstuff:/output` | `../output:/output` |
 | Environment variable `MARVYN_MAKEMKV_KEY` | MakeMKV [registration key](https://www.makemkv.com/buy/). When unset, a beta key is downloaded and used.  | `T-wN2...AE5z` | _none_ |
-| Environment variable `MARVYN_NICENESS` | CPU priority | `-19`..`20` | _none_ (effectively: Default of `nice` command)
+| Environment variable `MARVYN_NICENESS` | CPU priority (in terms of the `nice` command) | `-19`..`20` | _none_ (effectively: Default of `nice` command)
 | Environment variable `TZ` | Timezone | `Europe/Berlin` | _none_ |
-| Environment variable `FAKETIME` | System time that is used. Allows to circumvent expiration issues. See [libfaketime](https://github.com/wolfcw/libfaketime) for format specification and details. | `-14d`, `2020-12-24 20:30:00` | _none_ |
-| Service Option `cpu_shares` | CPU priority. See [CPU share constraint](https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources#cpu-share-constraint) for details. | `512` | `512` |
+| Environment variable `FAKETIME` | System time that MARVYN uses. This option allows to circumvent expiration issues. See [libfaketime](https://github.com/wolfcw/libfaketime) for format specification and details. | `-14d`, `2020-12-24 20:30:00` | _none_ |
+| Service Option `cpu_shares` | CPU priority. 1024 means normal, lower value mean lower priority. See [CPU share constraint](https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources#cpu-share-constraint) for details. | `512` | `512` |
 
 ### Autorip
-* Enable Autorip:
-  `sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/`
+Enable Autorip:
 
-Please change the file accordingly if your installation is not located in the
-default directory `/opt/docker/marvyn`, or if your disc drives have custom
-locations.
+```shell
+$ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+```
+
+Feel free to change the file content if
+* your installation is not located in the default directory `/opt/docker/marvyn`,
+* your disc drives have custom locations or
+* you want Autorip to run with a non-root user.
 
 #### Main configuration
 File `etc/rip-disc.yml`
@@ -107,33 +115,34 @@ File `etc/rip-disc.yml`
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
 | Device Options | Available disc drives | `/dev/cdrom:/dev/cdrom` | see `etc/rip-disc.yml` |
-| Environment variable `MARVYN_CD_TITLE_DEPTH` | Starting in the output directory, how many subdirectories do we have to descend to find the directory containing the CD title? Depends on the number of directories used in `OUTPUTFORMAT` and `VAOUTPUTFORMAT` in `data/.abcde.conf` | `1` | `3` |
+| Environment variable `MARVYN_CD_TITLE_DEPTH` | Starting in the output directory, how many subdirectories does MARVYN have to descend to find the directory containing the CD title? Should be set according to the directory count used in `OUTPUTFORMAT` and `VAOUTPUTFORMAT` in the file `data/.abcde.conf` | `1` | `3` |
 
 #### Mail notification
-File: `etc/mail.env`
+* File: `etc/mail.env`
 
 Notification mails are sent only when `MARVYN_MAIL_RECIPIENT` is set.
 
 | Option | Description | Examples |
 | -----  | ----------- | -------- |
-| `MARVYN_MAIL_SENDER` | Sender address | `marvyn@example.com` |
 | `MARVYN_MAIL_RECIPIENT` | Recipient address | `admin@example.com` |
+| `MARVYN_MAIL_SENDER` | Sender address | `marvyn@example.com` |
 | `MARVYN_MAIL_SERVER` | Mail server and optional port | `mail.example.com:587` |
 | `MARVYN_MAIL_USER` | Username for login on mail server | `mailaccount@mail.example.com` |
 | `MARVYN_MAIL_PASSWORD` | Password for login on mail server | `p4§§w0rD` |
 
 #### Audio CD ripping
-File: `data/.abcde.conf`
+* File: `data/.abcde.conf`
 
-* See [abcde](https://git.einval.com/cgi-bin/gitweb.cgi?p=abcde.git;a=blob;f=abcde.conf) documentation
+See the [abcde](https://git.einval.com/cgi-bin/gitweb.cgi?p=abcde.git;a=blob;f=abcde.conf)
+documentation for details.
 
 ### Video Disc Conversion
-File: `etc/transcode-disc-directory.yml`
+* File: `etc/transcode-disc-directory.yml`
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
-| Volume Mount `/work` | Working directory for temp files | `/tmp/transcoding:/work` | `../work:/work` |
-| Environment variable `MARVYN_CLEANUP` | Delete temp files after successful finish? | `yes`, `no` | `yes` |
+| Volume Mount `/work` | Working directory for temporary files | `/tmp/transcoding:/work` | `../work:/work` |
+| Environment variable `MARVYN_CLEANUP` | Delete temporary files after successful finish? | `yes`, `no` | `yes` |
 
 This configuration uses the _Video Transcoding_ configuration as default.
 Values in `etc/vaapi-transcode.yml` will be applied to all video transcoding
@@ -141,17 +150,17 @@ tasks, including _Video Disc Conversion_. Values in
 `etc/transcode-disc-directory.yml` will be applied to _Video Conversion_ only.
 
 ### Audio Conversion
-File: `etc/transcode-audio-directory.yml`
+* File: `etc/transcode-audio-directory.yml`
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
 | Environment variable `MARVYN_FFMPEG_OUTPUT_FORMAT` | Output format | `mp3`, `ogg` | `mp3` |
 | Environment variable `MARVYN_FFMPEG_OUTPUT_OPTIONS` | Output options for FFmpeg | see [FFmpeg documentation](https://ffmpeg.org/ffmpeg.html#Options) | `-q 5.5 -id3v2_version 3 -c:v copy` |
-| Environment variable `MARVYN_AUDIO_EXCLUDES` | Comma-separated list of filenames that are ignored for conversion. Glob expressions are supported. This option has no effect when `MARVYN_AUDIO_INCLUDES` is set. | `*.jpg,*.png,*.txt` | _none_ |
 | Environment variable `MARVYN_AUDIO_INCLUDES` | Comma-separated list of filenames that are considered for conversion. Glob expressions are supported. | `*.flac,*.ogg` | `*.flac,*.ogg,*.mp3` |
+| Environment variable `MARVYN_AUDIO_EXCLUDES` | Comma-separated list of filenames that are ignored for conversion. Glob expressions are supported. This option has no effect when `MARVYN_AUDIO_INCLUDES` is set. | `*.jpg,*.png,*.txt` | _none_ |
 
 ### Video Series Conversion
-File: `etc/transcode-series-directory.yml`
+* File: `etc/transcode-series-directory.yml`
 
 This configuration uses the _Video Disc Conversion_ configuration as default.
 Values in `etc/transcode-disc-directory.yml` will be applied to all video disc
@@ -160,10 +169,10 @@ conversion tasks, including _Video Series Conversion_. Values in
 _Video Servies Conversion_ only.
 
 ### Video Remultiplexing
-File: `etc/remux-directory.yml`
+* File: `etc/remux-directory.yml`
 
 ### Video Transcoding
-File: `etc/vaapi-transcode.yml`
+* File: `etc/vaapi-transcode.yml`
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
@@ -180,24 +189,36 @@ File: `etc/vaapi-transcode.yml`
 
 ## Advanced Topics
 
-### Management
+### Management tasks
 * Start a service (e.g. Audio Conversion):
-  ```
+  ```shell
   $ bin/transcode-audio-directory /media/audio/
   marvyn-transcode-audio-directory-20200312-061525
   ```
 * See the log:
-  `docker logs marvyn-transcode-audio-directory-20200312-061525`
+  ```shell
+  $ docker logs marvyn-transcode-audio-directory-20200312-061525
+  ```
 * Check status:
-  `docker ps -a --format={{.Status}} -f name=marvyn-transcode-audio-directory-20200312-061525`
+  ```shell
+  $ docker ps -a --format={{.Status}} -f name=marvyn-transcode-audio-directory-20200312-061525
+  ```
 * Stop service:
-  `docker stop marvyn-transcode-audio-directory-20200312-061525`
+  ```shell
+  $ docker stop marvyn-transcode-audio-directory-20200312-061525
+  ```
 * Remove a service container (including its logs):
-  `docker rm marvyn-transcode-audio-directory-20200312-061525`
+  ```shell
+  $ docker rm marvyn-transcode-audio-directory-20200312-061525
+  ```
 * Remove all MARVYN containers:
-  `docker container ls -a -q -f name=marvyn | xargs docker rm`
+  ```shell
+  $ docker container ls -a -q -f name=marvyn | xargs docker rm
+  ```
 * Start a shell within MARVYN:
-  `docker-compose -f etc/base.yml run --rm marvyn-base bash`
+  ```shell
+  $ docker-compose -f etc/base.yml run --rm marvyn-base bash
+  ```
 
 ### Environment variables
 Environment variables may either be declared in a configuration file
@@ -215,17 +236,21 @@ By default, the directories for `/output` and `/work` are read from the
 configuration file. Alternatively, it is possible to hand them over as command
 line arguments to a service, e.g.
 
-* ```bin/transcode-disc-directory /media/input.mp4 /media/output/```
-* ```bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/```
+* ```shell
+  $ bin/transcode-disc-directory /media/input.mp4 /media/output/
+  ```
+* ```shell
+  bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/
+  ```
 
 Unfortunately, this does not work reliably as long as
 [docker-compose #7270](https://github.com/docker/compose/issues/7270)
 is open: either the command line argument or the configuration file value
-will be chosen randomly. MARVYN knows this bug and will cancel if it deteced.
+will be chosen randomly. MARVYN knows this bug and will cancel when detected.
 
 ### Users, groups and permissions
-MARVYN is run with userid and groupid of the current user.
-Autorip is called by `udev` which is run as `root` by default.
+MARVYN services run with userid and groupid of the current user.
+Autorip is called by `udev` which runs as `root` by default.
 A different user may be configured by using `sudo -u` within the udev rule.
 
 ### Home directory
@@ -236,12 +261,46 @@ It contains all configuration and data needed at runtime, e.g.
 * Keys for disc decryption
 
 ### Base image (Linux distribution)
-The default Docker image is based on Ubuntu,
-an alternative Docker image based on Debian is available.
+The default Docker image is based on Ubuntu, an alternative Docker image based
+on Debian is available in `image/Dockerfile.debian`.
 
 ### Ripping of encrypted discs
 Detailed information about ripping of encrypted discs may be found
 in the resources listed in the file `README.keys`.
+
+### Extending MARVYN
+Example: Create a new service called _process-video_
+
+1. Create start script `bin/process-video`:
+   ```shell
+   ln -s .start bin/process-video
+   ```
+
+1. Create configuration file `etc/process-video.yml`:
+   ```yaml
+   ---
+   version: "2.2"
+   services:
+     marvyn-process-video:
+       extends:
+         file: base.yml
+         service: marvyn-base
+
+       <custom configuration here>
+   ```
+
+1. Create executable service script `services/process-video`, e.g.:
+   ```shell
+   #!/bin/sh
+   here="$(dirname ${0})"
+   . "${here}/.prepare"
+   if [ -z "${1-}" ] || [ ! -d "${1}" ] || [ -z "${2-}" ]; then
+     cancel "Syntax: $(basename $0) <input-directory> <output-directory>"
+   fi
+   mkdir -p "${output_fullpath}"
+  
+   <service implementation>
+   ```
 
 ### Components
 MARVYN integrates the following applications and libraries:
@@ -254,56 +313,69 @@ MARVYN integrates the following applications and libraries:
 * [sendEmail](http://caspian.dotconf.net/menu/Software/SendEmail/)
 * [libdvdcss](https://www.videolan.org/developers/libdvdcss.html)
 * [libfaketime](https://github.com/wolfcw/libfaketime)
-* udev
+* [udev](http://man7.org/linux/man-pages/man7/udev.7.html)
 
 
 ## Examples
-Given the following example directory structure:
+Given the output directory `/media/inbox/` and the following example directory structure:
 
-    ```
-     media
-     +-inbox
-     | +-CD
-     | +-DVD
-     | +-BD
-     +-audio
-     | +-single-track.mp3
-     | +-album
-     |   +-01.ogg
-     |   +-02.flac
-     |   +-folder.jpg
-     +-video
-     | +-movie.mp4
-     | +-movie
-     | | +-VIDEO_TS
-     | +-series
-     |   +-episode-01
-     |   | +-VIDEO_TS
-     |   +-episode-02
-     |     +-VIDEO_TS
-     +-phone
-    ```
+```
+media
++-inbox
+| +-CD
+| +-DVD
+| +-BD
++-audio
+| +-single-track.mp3
+| +-album
+|   +-01.ogg
+|   +-02.flac
+|   +-folder.jpg
++-video
+| +-movie.mp4
+| +-movie
+| | +-VIDEO_TS
+| +-series
+|   +-episode-01
+|   | +-VIDEO_TS
+|   +-episode-02
+|     +-VIDEO_TS
++-phone
+```
 
 * Rip a Blu-ray disc (1:1 copy) lossless to `/media/inbox/BD`
   and receive an e-mail notification on finish:
-  _insert the disc into the drive_
+
+  _Insert the disc into the drive_
 
 * Compress DVD directory `/media/video/movie/` to small MKV files
   containing a single language, using VAAPI hardware transcoding:
-  ```$ bin/transcode-disc-directory /media/video/movie/```
+  ```shell
+  $ bin/transcode-disc-directory /media/video/movie/
+  ```
 
 * The same for a directory containing several DVDs of a series
   in directory `/media/video/series`:
-   ```$ bin/transcode-series-directory /media/video/series/```
+  ```shell
+  $ bin/transcode-series-directory /media/video/series/
+  ```
 
 * For a MP4 file `/media/video/movie.mp4` with output format MP4:
-  ```$ bin/vaapi-transcode /media/video/movie.mp4```
+  ```shell
+  $ bin/vaapi-transcode /media/video/movie.mp4
+  ```
 
 * For a MP4 file `/media/video/movie.mp4` with output format MKV:
-  ```$ bin/vaapi-transcode /media/video/movie.mp4 /media/phone/movie.mkv```
+  ```shell
+  $ bin/vaapi-transcode /media/video/movie.mp4 /media/phone/movie.mkv
+  ```
 
 * Convert DVD directory `/media/video/movie` losslessly to MKV format:
-  ```$ bin/remux-directory /media/video/movie/```
+  ```shell
+  $ bin/remux-directory /media/video/movie/
+  ```
 
-* Convert audio directory `media/audio` to mp3 keeping tags:
-  ```$ bin/transcode-audio-directory /media/audio/```
+* Convert audio directory `media/audio` to mp3, keeping tags:
+  ```shell
+  $ bin/transcode-audio-directory /media/audio/
+  ```
