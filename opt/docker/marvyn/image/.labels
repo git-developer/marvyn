@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+IMAGE_VENDOR="ckware"
+IMAGE_TITLE="marvyn"
+IMAGE_VERSION="latest"
+
+IMAGE_DESCRIPTION="MARVYN - Mastering Audio, Ripping & Video tasks automaticallY & Nicely"
+IMAGE_URL="https://github.com/git-developer/marvyn"
+IMAGE_DOCUMENTATION="https://github.com/git-developer/marvyn#readme"
+IMAGE_LICENSES="GPL-3.0"
+IMAGE_AUTHORS="Christian <git-developer@ckware.net>"
+
+IMAGE_REVISION="$(2>/dev/null git rev-parse --short HEAD || true)"
+IMAGE_CREATED="$(date -u --rfc-3339 seconds)"
+IMAGE_REF_NAME="$(2>/dev/null git rev-parse --abbrev-ref HEAD || true)"
