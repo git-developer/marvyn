@@ -42,12 +42,16 @@ The ARM platform (eg. Raspberry Pi) is not supported as long as
 
 
 ## Installation
-1. Download to `/opt/docker/marvyn/`, e.g.
-    * `$ git clone --depth 1 https://github.com/git-developer/marvyn`
-    * `$ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/`
+1. Download to `/opt/docker/marvyn`, e.g.
+    ```shell
+    $ git clone --depth 1 https://github.com/git-developer/marvyn
+    $ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn /opt/docker/
+    ```
 1. Create Docker image (this will take a few minutes):
-    * `$ /opt/docker/marvyn/image/build`
-    If you wish to use custom Docker tag and labels, change the values in
+    ```shell
+     $ /opt/docker/marvyn/image/build
+    ```
+    If you wish to customize the tags and labels, change the values in
     `image/.labels`and `etc/base.yml` accordingly.
 
 ## Usage
