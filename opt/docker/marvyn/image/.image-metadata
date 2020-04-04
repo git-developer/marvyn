@@ -1,4 +1,3 @@
-#!/usr/bin/env sh
 IMAGE_VENDOR="ckware"
 IMAGE_TITLE="marvyn"
 IMAGE_VERSION="latest"

@@ -1,17 +1,3 @@
 #!/usr/bin/env sh
-set -eu
-here="$(dirname "${0}")"
-. "${here}/.labels"
-docker build -t "${IMAGE_VENDOR}/${IMAGE_TITLE}:${IMAGE_VERSION}" \
-    --label "org.opencontainers.image.vendor=${IMAGE_VENDOR}" \
-    --label "org.opencontainers.image.title=${IMAGE_TITLE}" \
-    --label "org.opencontainers.image.version=${IMAGE_VERSION}" \
-    ${IMAGE_CREATED:+--label "org.opencontainers.image.created=${IMAGE_CREATED}"} \
-    ${IMAGE_AUTHORS:+--label "org.opencontainers.image.authors=${IMAGE_AUTHORS}"} \
-    ${IMAGE_URL:+--label "org.opencontainers.image.url=${IMAGE_URL}"} \
-    ${IMAGE_DOCUMENTATION:+--label "org.opencontainers.image.documentation=${IMAGE_DOCUMENTATION}"} \
-    ${IMAGE_REVISION:+--label "org.opencontainers.image.revision=${IMAGE_REVISION}"} \
-    ${IMAGE_LICENSES:+--label "org.opencontainers.image.licenses=${IMAGE_LICENSES}"} \
-    ${IMAGE_REF_NAME:+--label "org.opencontainers.image.ref.name=${IMAGE_REF_NAME}"} \
-    ${IMAGE_DESCRIPTION:+--label "org.opencontainers.image.description=${IMAGE_DESCRIPTION}"} \
-    "${here}"
+here=$(dirname "${0}")
+IMAGE_METADATA_FILE="${IMAGE_METADATA_FILE:-"${here}/.image-metadata"}" "${here}/build-with-metadata" "${here}"
