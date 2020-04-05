@@ -15,6 +15,7 @@ services:
       - ID_CDROM_MEDIA_BD
       - ID_FS_LABEL
       - MARVYN_CD_TITLE_DEPTH=3
+      - MARVYN_EJECT_DISC=no
     devices:
       - /dev/cdrom:/dev/cdrom
       - /dev/dvd:/dev/dvd

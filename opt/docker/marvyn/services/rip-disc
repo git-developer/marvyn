@@ -83,14 +83,18 @@ rip_disc() {
   message="Kopie von '${title:-unbekannt}' mit ${result} beendet."
   log "${message}"
 
+  if [ "${MARVYN_EJECT_DISC:-no}" = 'yes' ]; then
+    eject
+  fi
+
   if [ "${MARVYN_MAIL_RECIPIENT}" ]; then
-   [ -f "${logfile}" ] || touch "${logfile}"
-   <"${logfile}" sendemail -q -u "${message}" \
-     -f "${MARVYN_MAIL_SENDER}" \
-     -t "${MARVYN_MAIL_RECIPIENT}" \
-     -s "${MARVYN_MAIL_SERVER}" \
-     -xu "${MARVYN_MAIL_USER}" \
-     -xp "${MARVYN_MAIL_PASSWORD}"
+    [ -f "${logfile}" ] || touch "${logfile}"
+    <"${logfile}" sendemail -q -u "${message}" \
+      -f "${MARVYN_MAIL_SENDER}" \
+      -t "${MARVYN_MAIL_RECIPIENT}" \
+      -s "${MARVYN_MAIL_SERVER}" \
+      -xu "${MARVYN_MAIL_USER}" \
+      -xp "${MARVYN_MAIL_PASSWORD}"
   fi
 }
 

@@ -142,6 +142,7 @@ File `etc/rip-disc.yml`
 | -----  | ----------- | -------- | ------- |
 | Device Options | Available disc drives | `/dev/cdrom:/dev/cdrom` | see `etc/rip-disc.yml` |
 | Environment variable `MARVYN_CD_TITLE_DEPTH` | Starting in the output directory, how many subdirectories does MARVYN have to descend to find the directory containing the CD title? Should be set according to the directory count used in `OUTPUTFORMAT` and `VAOUTPUTFORMAT` in the file `data/.abcde.conf` | `1` | `3` |
+| Environment variable `MARVYN_EJECT_DISC` | Eject disc on finish | `yes` | `no` |
 
 #### Mail notification
 * File: `etc/mail.env`
