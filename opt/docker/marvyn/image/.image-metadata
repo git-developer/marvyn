@@ -4,7 +4,7 @@ IMAGE_VERSION="latest"
 
 IMAGE_DESCRIPTION="MARVYN - Mastering Audio, Ripping & Video tasks automaticallY & Nicely"
 IMAGE_URL="https://github.com/git-developer/marvyn"
-IMAGE_DOCUMENTATION="https://github.com/git-developer/marvyn#readme"
+IMAGE_DOCUMENTATION="${IMAGE_URL}#readme"
 IMAGE_LICENSES="GPL-3.0"
 IMAGE_AUTHORS="Christian <git-developer@ckware.net>"
 
