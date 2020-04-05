@@ -20,13 +20,12 @@ MARVYN is nice:
 * Install:
   ```shell
   $ sudo apt install docker-compose
-  $ git clone --depth 1 https://github.com/git-developer/marvyn
-  $ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/
+  $ wget -O - https://github.com/git-developer/marvyn/tarball/develop | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
   $ /opt/docker/marvyn/image/build
   ```
 * Enable autorip:
   ```shell
-  $ sudo cp udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+  $ sudo cp /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
   $ sudo udevadm control --reload
   ```
 * Run: _Insert disc_
@@ -123,7 +122,7 @@ Video conversion uses hardware transcoding.
 Enable Autorip:
 
 ```shell
-$ sudo cp udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+$ sudo cp /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
 $ sudo udevadm control --reload
 ```
 
