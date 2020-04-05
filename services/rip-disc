@@ -77,7 +77,7 @@ rip_disc() {
 
   if [ "${return_code}" -eq 0 ]; then result="Erfolg"; else result="Fehler ${return_code}"; fi
   if [ -d "${target}" ]; then
-    disc_dir=$(find "${target}" -mindepth "${depth}" -maxdepth "${depth}" -printf '%f\n' | uniq | tr -d '\n')
+    disc_dir=$(find "${target}" -mindepth "${depth}" -maxdepth "${depth}" -printf '%T@ %f\n' | sort -n | cut -d' ' -f 2- | tail -n 1)
     title="${disc_dir##${target}/}"
   fi
   message="Kopie von '${title:-unbekannt}' mit ${result} beendet."
