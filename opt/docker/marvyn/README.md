@@ -24,6 +24,11 @@ MARVYN is nice:
   $ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn/ /opt/docker/
   $ /opt/docker/marvyn/image/build
   ```
+* Enable autorip:
+  ```shell
+  $ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+  $ sudo udevadm control --reload-rules
+  ```
 * Run: _Insert disc_
 
 ## Pre-requisites
@@ -119,6 +124,7 @@ Enable Autorip:
 
 ```shell
 $ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+$ sudo udevadm control --reload-rules
 ```
 
 You have to to modify the file content only if one or more of the following
