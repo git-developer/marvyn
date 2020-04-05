@@ -27,7 +27,7 @@ MARVYN is nice:
 * Enable autorip:
   ```shell
   $ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
-  $ sudo udevadm control --reload-rules
+  $ sudo udevadm control --reload
   ```
 * Run: _Insert disc_
 
@@ -124,7 +124,7 @@ Enable Autorip:
 
 ```shell
 $ sudo cp etc/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
-$ sudo udevadm control --reload-rules
+$ sudo udevadm control --reload
 ```
 
 You have to to modify the file content only if one or more of the following
