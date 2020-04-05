@@ -25,7 +25,7 @@ MARVYN is nice:
   ```
 * Enable autorip:
   ```shell
-  $ sudo cp /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+  $ sudo ln -s /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/disc-detection.rules
   $ sudo udevadm control --reload
   ```
 * Run: _Insert disc_
@@ -122,7 +122,7 @@ Video conversion uses hardware transcoding.
 Enable Autorip:
 
 ```shell
-$ sudo cp /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/
+$ sudo ln -s /opt/docker/marvyn/udev/rules.d/disc-detection.rules /etc/udev/rules.d/disc-detection.rules
 $ sudo udevadm control --reload
 ```
 
