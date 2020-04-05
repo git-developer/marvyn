@@ -72,7 +72,7 @@ docker_compose="$(command -v docker-compose)" || cancel 'Error: docker-compose i
 exec "${docker_compose}" "--file=${compose_file}" run \
   "--name=${container_name}" \
   "--user=${user}" \
-  "--detach" \
+  "-d" \
   ${input_host:+"--volume=${input_host}:${input_basedir_container}:ro"} \
   ${output_host:+"--volume=${output_host}:${output_basedir_container}:rw"} \
   ${work_host:+"--volume=${work_host}:${work_basedir_container}:rw"} \
