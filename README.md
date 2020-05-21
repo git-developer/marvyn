@@ -17,6 +17,9 @@ MARVYN is nice:
 - Does not need root permissions
 
 ## TL;DR
+* Pre-requisites: the current user has permissions to
+  * create the directory `/opt/docker/marvyn`
+  * build a Docker image
 * Install:
   ```shell
   $ sudo apt install docker-compose
@@ -48,8 +51,8 @@ The ARM platform (eg. Raspberry Pi) is not supported as long as
 ## Installation
 1. Download to `/opt/docker/marvyn`, e.g.
     ```shell
-    $ git clone --depth 1 https://github.com/git-developer/marvyn
-    $ mkdir -p /opt/docker && mv marvyn/opt/docker/marvyn /opt/docker/
+    $ (groups | grep -oP users || id -gn) | xargs -I {} sudo sh -c 'mkdir -p -m 0775 /opt/docker && chown ":{}" /opt/docker'
+    $ wget -O - https://github.com/git-developer/marvyn/tarball/develop | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
     ```
 1. Create Docker image (this will take a few minutes):
     ```shell
