@@ -58,7 +58,7 @@ if [ -n "${3-}" ]; then
   mkdir -p "${work_host}"
   export MARVYN_WORK_INODE=$(stat -c %i "${work_host}")
 else
-  work_fullpath_container="${work_basedir_container}/${input_filename:+/${input_filename}}"
+  work_fullpath_container="${work_basedir_container}${input_filename:+/${input_filename}}"
 fi
 
 # Inject environment variables prefixed with MARVYN_ into the container
