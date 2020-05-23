@@ -25,10 +25,15 @@ input_basedir_container='/input'
 if [ -n "${1-}" ]; then
   input_fullpath_host=$(realpath "${1}")
   [ -e "${input_fullpath_host}" ] || cancel "Error: input '${1}' does not exist."
-  input_host=$(dirname  "${input_fullpath_host}")
-  input_filename=$(    basename "${input_fullpath_host}")
-  input_fullpath_container="${input_basedir_container}/${input_filename}"
-  export MARVYN_INPUT_INODE=$(stat -c %i "${input_host}")
+  case "${input_fullpath_host}" in
+    /dev/*) input_fullpath_container="${input_fullpath_host}"
+            ;;
+    *)      input_host=$(dirname "${input_fullpath_host}")
+            input_filename=$(basename "${input_fullpath_host}")
+            input_fullpath_container="${input_basedir_container}/${input_filename}"
+            export MARVYN_INPUT_INODE=$(stat -c %i "${input_host}")
+            ;;
+  esac
 fi
 
 output_basedir_container='/output'

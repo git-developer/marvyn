@@ -115,7 +115,9 @@ main() {
       rip_disc "${target}" 1 dvdbackup -M -i "${input_fullpath}"
       ;;
     BD)
-      rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt "dev:${input_fullpath}" "${target}"
+      disc_id=$(makemkvcon -r --cache=1 info disc:9999 | sed -nE "s#DRV:([0-9]+).+\"${input_fullpath}\"\$#\1#p")
+      [ -n "${disc_id}" ] || cancel "Error detecting disc id from device ${input_fullpath}"
+      rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt "disc:${disc_id}" "${target}"
       ;;
     *)
       log "No action taken."
