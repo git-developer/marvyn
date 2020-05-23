@@ -1,4 +1,6 @@
 #!/bin/sh
+here="$(dirname ${0})"
+. "${here}/.prepare"
 
 log() {
   >&2 echo "${@}"
@@ -31,18 +33,18 @@ wait_for_child_process() {
 find_medium_type() {
   # for a list of possible variables, see
   # https://github.com/systemd/systemd/blob/master/src/udev/cdrom_id/cdrom_id.c
-  if   [ "${ID_CDROM_MEDIA_CD}"   = "1" ]; then
+  if   [ "${ID_CDROM_MEDIA_CD-}"   = "1" ]; then
     medium_type='CD'
-  elif [ "${ID_CDROM_MEDIA_CD_R}" = "1" ]; then
-   medium_type='CD-R'
-  elif [ "${ID_CDROM_MEDIA_DVD}"  = "1" ]; then
+  elif [ "${ID_CDROM_MEDIA_CD_R-}" = "1" ]; then
+    medium_type='CD-R'
+  elif [ "${ID_CDROM_MEDIA_DVD-}"  = "1" ]; then
     medium_type='DVD'
-  elif [ "${ID_CDROM_MEDIA_BD}"   = "1" ]; then
-   medium_type='BD'
+  elif [ "${ID_CDROM_MEDIA_BD-}"   = "1" ]; then
+    medium_type='BD'
   fi
 
   if [ "${medium_type}" ]; then
-    if [ "${ID_FS_LABEL}" ]; then
+    if [ -n "${ID_FS_LABEL-}" ]; then
       message="The ${medium_type} '${ID_FS_LABEL}'"
     else
       message="A ${medium_type}"
@@ -100,18 +102,18 @@ rip_disc() {
 
 main() {
   medium_type=$(find_medium_type)
-  target="/output/${medium_type}/${ID_FS_LABEL}"
+  target="/output/${medium_type}/${ID_FS_LABEL-}"
   mkdir -p "${target}"
   cd "${target}"
   case "${medium_type}" in
     CD)
-      rip_disc "${target}" "${MARVYN_CD_TITLE_DEPTH:-1}" abcde -N -d /dev/cdrom
+      rip_disc "${target}" "${MARVYN_CD_TITLE_DEPTH:-1}" abcde -N -d "${input_fullpath}"
       ;;
     DVD)
-      rip_disc "${target}" 1 dvdbackup -M
+      rip_disc "${target}" 1 dvdbackup -M -i "${input_fullpath}"
       ;;
     BD)
-      rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt disc:0 "${target}"
+      rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt "dev:${input_fullpath}" "${target}"
       ;;
     *)
       log "No action taken."
@@ -119,4 +121,4 @@ main() {
   esac
 }
 
-main
+main "${@}"
