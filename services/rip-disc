@@ -13,7 +13,7 @@ prepare_child_process() {
 }
 
 handle_term() {
-    if [ "${term_child_pid}" ]; then
+    if [ -n "${term_child_pid-}" ]; then
         kill -TERM "${term_child_pid}" 2>/dev/null
     else
         term_kill_needed="yes"
@@ -22,7 +22,7 @@ handle_term() {
 
 wait_for_child_process() {
     term_child_pid="$!"
-    if [ "${term_kill_needed}" ]; then
+    if [ -n "${term_kill_needed-}" ]; then
         kill -TERM "${term_child_pid}" 2>/dev/null
     fi
     wait "${term_child_pid}"
@@ -43,7 +43,7 @@ find_medium_type() {
     medium_type='BD'
   fi
 
-  if [ "${medium_type}" ]; then
+  if [ -n "${medium_type-}" ]; then
     if [ -n "${ID_FS_LABEL-}" ]; then
       message="The ${medium_type} '${ID_FS_LABEL}'"
     else
@@ -54,7 +54,7 @@ find_medium_type() {
     message="The disc was ejected or an unsupported disc was inserted."
   fi
   log "${message}"
-  echo "${medium_type}"
+  echo "${medium_type-}"
 }
 
 rip_disc() {
@@ -89,7 +89,7 @@ rip_disc() {
     eject
   fi
 
-  if [ "${MARVYN_MAIL_RECIPIENT}" ]; then
+  if [ -n "${MARVYN_MAIL_RECIPIENT-}" ]; then
     [ -f "${logfile}" ] || touch "${logfile}"
     <"${logfile}" sendemail -q -u "${message}" \
       -f "${MARVYN_MAIL_SENDER}" \
@@ -101,7 +101,7 @@ rip_disc() {
 }
 
 main() {
-  medium_type=$(find_medium_type)
+  medium_type="$(find_medium_type)"
   target="/output/${medium_type}/${ID_FS_LABEL-}"
   mkdir -p "${target}"
   cd "${target}"
