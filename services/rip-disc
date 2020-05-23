@@ -58,6 +58,8 @@ find_medium_type() {
 }
 
 rip_disc() {
+  log "Input:  ${input_fullpath}"
+  log "Output: ${target}"
   export logfile=/tmp/rip-disc.log
   target="${1}" && shift
   depth="${1}" && shift
