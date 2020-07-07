@@ -347,7 +347,7 @@ MARVYN integrates the following applications and libraries:
 * [libdvdcss](https://www.videolan.org/developers/libdvdcss.html)
 * [libfaketime](https://github.com/wolfcw/libfaketime)
 * [udev](http://man7.org/linux/man-pages/man7/udev.7.html)
-
+* [DVD duplicate detector](https://www.fabiankeil.de/gehacktes/dvd-duplicate-detector/)
 
 ## Examples
 Given the output directory `/media/inbox/` and the following example directory structure:
