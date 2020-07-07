@@ -45,11 +45,13 @@ RUN mkdir -p /usr/share/man/man1 # fix for https://bugs.debian.org/cgi-bin/bugre
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
       tzdata \
       '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
-      dvdbackup \
+      dvdbackup genisoimage \
       abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
       ffmpeg libva-drm2 libva2 i965-va-driver \
       sendemail libio-socket-ssl-perl
 COPY ./patch-abcde /tmp/patch-abcde
 RUN /tmp/patch-abcde && rm /tmp/patch-abcde
+RUN wget -q -O /usr/local/bin/dvd-duplicate-detector.pl https://www.fabiankeil.de/sourcecode/dvd-duplicate-detector.pl && \
+    chmod +x /usr/local/bin/dvd-duplicate-detector.pl
 VOLUME /opt/marvyn/
 ENTRYPOINT exec nice ${MARVYN_NICENESS:+-n "${MARVYN_NICENESS}"} "${0}" "${@}"

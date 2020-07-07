@@ -104,7 +104,8 @@ rip_disc() {
 
 main() {
   medium_type="$(find_medium_type)"
-  target="/output/${medium_type}/${ID_FS_LABEL-}"
+  medium_id="${ID_FS_LABEL:-$(date +%Y%m%d_%H%M%S)}"
+  target="/output/${medium_type}/${medium_id}"
   mkdir -p "${target}"
   cd "${target}"
   case "${medium_type}" in
@@ -112,7 +113,10 @@ main() {
       rip_disc "${target}" "${MARVYN_CD_TITLE_DEPTH:-1}" abcde -N -d "${input_fullpath}"
       ;;
     DVD)
-      rip_disc "${target}" 1 dvdbackup -M -i "${input_fullpath}"
+      # Try to create hard links for duplicated files. Will continue with an
+      # error message if the file system does not support hard links.
+      isoinfo -l -i "${input_fullpath}" | dvd-duplicate-detector.pl --deduplicate-directory "${target}"
+      rip_disc "${target}" 1 dvdbackup -M -n "${medium_id}" -i "${input_fullpath}" -o "/output/${medium_type}"
       ;;
     BD)
       disc_id=$(makemkvcon -r --cache=1 info disc:9999 | sed -nE "s#DRV:([0-9]+).+\"${input_fullpath}\"\$#\1#p")

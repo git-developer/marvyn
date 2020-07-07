@@ -293,6 +293,14 @@ on Debian is available in `image/Dockerfile.debian`.
 Detailed information about ripping of encrypted discs may be found
 in the resources listed in the file `README.keys`.
 
+### DVD duplicate file detection (requires support for hard links)
+A few DVDs appear to be huge (e.g. 70 GB) because they contain multiple VOB files
+that reference the same data. MARVYN integrates a
+[DVD duplicate detector](https://www.fabiankeil.de/gehacktes/dvd-duplicate-detector/)
+to rip only the necessary files and use hard links for the rest. This mechanism
+requires that the target file system supports hard links and does not work
+otherwise (e.g. for samba mounts).
+
 ### Extending MARVYN
 Example: Create a new service called _process-video_
 
