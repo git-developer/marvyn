@@ -18,11 +18,11 @@ find_language() {
     return 0
   fi
   available_languages=$(printf "${languages}" | xargs | tr ' ' ',')
-  language_count=$(printf "${languages}" | wc -l)
-  if [ "${language_count}" -lt 2 ]; then
+  if [ "${available_languages#*,}" = "${available_languages}" ]; then
     echo "${languages}"
     return 0
   fi
+
 
   for allowed_language in $(echo "${allowed_languages}" | tr ',' '\n'); do
     for available_language in $(echo "${available_languages}" | tr ',' '\n'); do
