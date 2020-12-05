@@ -116,7 +116,7 @@ main() {
       # Try to create hard links for duplicated files. Will continue with an
       # error message if the file system does not support hard links.
       isoinfo -l -i "${input_fullpath}" | dvd-duplicate-detector.pl --deduplicate-directory "${target}"
-      rip_disc "${target}" 1 dvdbackup -M -n "${medium_id}" -i "${input_fullpath}" -o "/output/${medium_type}"
+      rip_disc "${target}" 0 dvdbackup -M -n "${medium_id}" -i "${input_fullpath}" -o "/output/${medium_type}"
       ;;
     BD)
       disc_id=$(makemkvcon -r --cache=1 info disc:9999 | sed -nE "s#DRV:([0-9]+).+\"${input_fullpath}\"\$#\1#p")
