@@ -111,7 +111,8 @@ main() {
   if [ ! -e "${target}" ]; then
     mkdir -p "${target}"
   elif [ "${MARVYN_OVERWRITE:-no}" != "yes" ]; then
-    target="$(mktemp -d "${target}.XXX")"
+    target="$(mktemp -d "${target}.XXXXXX")"
+    medium_id="$(basename "${target}")"
   fi
   cd "${target}"
   case "${medium_type}" in
