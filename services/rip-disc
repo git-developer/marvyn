@@ -104,6 +104,8 @@ rip_disc() {
 
 main() {
   medium_type="$(find_medium_type)"
+  [ -n "${medium_type}" ] || return
+
   medium_id="${ID_FS_LABEL:-$(date +%Y%m%d_%H%M%S)}"
   target="/output/${medium_type}/${medium_id}"
   mkdir -p "${target}"
@@ -124,7 +126,7 @@ main() {
       rip_disc "${target}" 0 "$(dirname "${0}")/makemkvcon" backup --decrypt "disc:${disc_id}" "${target}"
       ;;
     *)
-      log "No action taken."
+      log "No action taken for unsupported medium type '${medium_type}'."
       ;;
   esac
 }
