@@ -108,7 +108,11 @@ main() {
 
   medium_id="${ID_FS_LABEL:-$(date +%Y%m%d_%H%M%S)}"
   target="/output/${medium_type}/${medium_id}"
-  mkdir -p "${target}"
+  if [ ! -e "${target}" ]; then
+    mkdir -p "${target}"
+  elif [ "${MARVYN_OVERWRITE:-no}" != "yes" ]; then
+    target="$(mktemp -d "${target}.XXX")"
+  fi
   cd "${target}"
   case "${medium_type}" in
     CD)
