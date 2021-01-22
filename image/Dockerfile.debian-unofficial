@@ -1,0 +1,47 @@
+ARG DISTRO=buster
+ARG SOURCE=debian:${DISTRO}-slim
+ARG LIBDVD_DIR=/tmp/libdvd-pkg
+ARG DEBIAN_FRONTEND=noninteractive
+
+FROM ${SOURCE} AS libdvd
+ARG DEBIAN_FRONTEND
+ARG LIBDVD_DIR
+ARG DISTRO
+RUN echo "deb http://deb.debian.org/debian ${DISTRO} contrib" | tee /etc/apt/sources.list.d/contrib.list
+WORKDIR ${LIBDVD_DIR}
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+      libdvd-pkg equivs && \
+    dpkg-reconfigure -f noninteractive libdvd-pkg && \
+    equivs-control libdvd-pkg && \
+    version=$(apt-cache policy libdvd-pkg | grep 'Candidate:' | cut -c 14-) && \
+    sed -i "s/Standards-Version:.*/Version: ${version}/g" libdvd-pkg && \
+    sed -i "s/Package:.*/Package: libdvd-pkg/g" libdvd-pkg && \
+    equivs-build libdvd-pkg && \
+    mv /usr/src/libdvd-pkg/libdvdcss2_*.deb "${LIBDVD_DIR}"
+
+FROM ${SOURCE}
+ARG DISTRO
+ARG LIBDVD_DIR
+ARG DEBIAN_FRONTEND
+COPY --from=libdvd "${LIBDVD_DIR}/" /tmp/libdvd/
+RUN dpkg -i /tmp/libdvd/libdvd-pkg_*.deb /tmp/libdvd/libdvdcss2_*.deb && apt-mark hold libdvd-pkg && rm -r /tmp/libdvd/
+RUN apt-get update && apt-get install -y -qq gnupg curl && \
+    curl -sSL -o /etc/apt/trusted.gpg.d/calenhad.gpg https://apt.calenhad.com/debian/calenhad.gpg && \
+    echo "deb https://apt.calenhad.com/debian ${DISTRO} contrib non-free" | tee /etc/apt/sources.list.d/makemkv.list && \
+    apt-get update && apt-get install -y --no-install-recommends -qq makemkvcon && \
+    apt-get remove --purge --autoremove -y gnupg && \
+    rm /etc/apt/trusted.gpg.d/calenhad.gpg /etc/apt/sources.list.d/makemkv.list
+RUN mkdir -p /usr/share/man/man1 # fix for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+      tzdata \
+      '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
+      dvdbackup genisoimage \
+      abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
+      ffmpeg libva-drm2 libva2 i965-va-driver \
+      sendemail libio-socket-ssl-perl
+COPY ./patch-abcde /tmp/patch-abcde
+RUN /tmp/patch-abcde && rm /tmp/patch-abcde
+RUN curl -sSL -o /usr/local/bin/dvd-duplicate-detector.pl https://www.fabiankeil.de/sourcecode/dvd-duplicate-detector.pl && \
+    chmod +x /usr/local/bin/dvd-duplicate-detector.pl
+VOLUME /opt/marvyn/
+ENTRYPOINT exec nice ${MARVYN_NICENESS:+-n "${MARVYN_NICENESS}"} "${0}" "${@}"
