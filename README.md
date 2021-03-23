@@ -34,7 +34,7 @@ MARVYN is nice:
 * Run: _Insert disc_
 
 ## Pre-requisites
-- An x86 compatible linux system with `docker-compose`
+- A linux system with `docker-compose`.
 
 The Docker Compose [documentation](https://docs.docker.com/compose/install/)
 contains a comprehensive guide explaining several install options.
@@ -43,9 +43,6 @@ On debian-based systems, `docker-compose` may be installed by calling
 ```shell
 $ sudo apt install docker-compose
 ```
-
-The ARM platform (eg. Raspberry Pi) is not supported as long as
-[MakeMKV](https://makemkv.com/) is available for x86 only.
 
 
 ## Installation

@@ -37,8 +37,9 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install
       '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
       dvdbackup genisoimage \
       abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
-      ffmpeg libva-drm2 libva2 i965-va-driver \
+      ffmpeg libva-drm2 libva2 \
       sendemail libio-socket-ssl-perl
+RUN [ "$(apt-cache search '^i965-va-driver$' | wc -l)" -eq 0 ] || apt-get install -y --no-install-recommends -qq i965-va-driver
 COPY ./patch-abcde /tmp/patch-abcde
 RUN /tmp/patch-abcde && rm /tmp/patch-abcde
 RUN curl -sSL -o /usr/local/bin/dvd-duplicate-detector.pl https://www.fabiankeil.de/sourcecode/dvd-duplicate-detector.pl && \
