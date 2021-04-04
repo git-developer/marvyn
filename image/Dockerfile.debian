@@ -1,4 +1,4 @@
-ARG DISTRO=buster
+ARG DISTRO=stable
 ARG SOURCE=debian:${DISTRO}-slim
 ARG MAKEMKV_VERSION
 ARG MAKEMKV_DIR=/tmp/makemkv

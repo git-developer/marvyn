@@ -1,4 +1,4 @@
-ARG SOURCE=ubuntu:20.04
+ARG SOURCE=ubuntu:latest
 ARG MAKEMKV_VERSION
 ARG MAKEMKV_DIR=/tmp/makemkv
 ARG LIBDVD_DIR=/tmp/libdvd-pkg
