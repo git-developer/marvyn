@@ -133,7 +133,7 @@ You have to to modify the file content only if one or more of the following
 cases apply:
 * MARVYN is not located in the default directory `/opt/docker/marvyn`.
 * Your disc drive is not mounted at the default locations `/dev/sg1` and
-  `/dev/sr0`; you also have to modify `etc/rip-disc.yml` in this case. Run ```lsscsi -g``` to find your optical drives and their mount locations.
+  `/dev/sr0`; you also have to modify `etc/rip-disc.yml` in this case. Run `lsscsi -g` to find your optical drives and their mount locations.
 * You want to run Autorip as a non-root user; change the command to
   `/usr/bin/sudo -E -u <user> /opt/docker/marvyn/bin/rip-disc` in this case.
 
