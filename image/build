@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 here=$(dirname "${0}")
-IMAGE_METADATA_FILE="${IMAGE_METADATA_FILE:-"${here}/.image-metadata"}" "${here}/build-with-metadata" "${here}"
+IMAGE_METADATA_FILE="${IMAGE_METADATA_FILE:-"${here}/.image-metadata"}" "${here}/build-with-metadata" "${@}" "${here}"
