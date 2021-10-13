@@ -14,7 +14,7 @@ if [ -n "${MARVYN_AUDIO_EXCLUDES-}" ]; then
   for exclude in $(echo "${MARVYN_AUDIO_EXCLUDES}" | tr ',' '\n'); do find_filter="${find_filter:+${find_filter} -a} ! -name ${exclude}"; done
 fi
 
-find "${input_fullpath}" -type f ${find_filter:+${find_filter}} | while IFS= read -r input_file; do {
+find "${input_fullpath}" -type f ${find_filter:+${find_filter}} | sort | while IFS= read -r input_file; do {
   filepath="${input_file#*${input_fullpath}/}"
   output_file="${output_fullpath}/${filepath%.*}.${MARVYN_FFMPEG_OUTPUT_FORMAT:-mp3}"
   mkdir -p "$(dirname "${output_file}")"
