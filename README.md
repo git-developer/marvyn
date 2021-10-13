@@ -23,7 +23,7 @@ MARVYN is nice:
 * Install:
   ```shell
   $ sudo apt install docker-compose
-  $ wget -O - https://github.com/git-developer/marvyn/tarball/develop | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
+  $ wget -O - https://github.com/git-developer/marvyn/tarball/main | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
   $ /opt/docker/marvyn/image/build
   ```
 * Enable autorip:
@@ -49,7 +49,7 @@ $ sudo apt install docker-compose
 1. Download to `/opt/docker/marvyn`, e.g.
     ```shell
     $ (groups | grep -oP users || id -gn) | xargs -I {} sudo sh -c 'mkdir -p -m 0775 /opt/docker && chown ":{}" /opt/docker'
-    $ wget -O - https://github.com/git-developer/marvyn/tarball/develop | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
+    $ wget -O - https://github.com/git-developer/marvyn/tarball/main | tar --one-top-level=/opt/docker/marvyn --strip-components 1 -xz
     ```
 1. Create Docker image (this will take a few minutes):
     ```shell
