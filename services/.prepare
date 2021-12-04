@@ -37,3 +37,8 @@ if [ -n "${MARVYN_OUTPUT_INODE-}" ]; then
     cancel
   fi
 fi
+
+if [ -z "${LD_PRELOAD-}" ]; then
+  libfaketime=$(dpkg -L libfaketime | grep -F libfaketime.so)
+  [ ! -r "${libfaketime-}" ] || export LD_PRELOAD="${libfaketime}"
+fi

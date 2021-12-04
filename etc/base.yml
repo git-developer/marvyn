@@ -11,7 +11,7 @@ services:
       - ../output:/output
     environment:
       - HOME=/home/marvyn
-      - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
+      - LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/faketime/libfaketime.so.1
       - FAKETIME
       - TZ
       - MARVYN_MAKEMKV_BETAKEY_URL=https://www.makemkv.com/forum/viewtopic.php?f=5&t=1053
