@@ -6,7 +6,7 @@ services:
       file: base.yml
       service: marvyn-base
     environment:
-      - MARVYN_FFMPEG_OUTPUT_FORMAT=mp3
-      - MARVYN_FFMPEG_OUTPUT_OPTIONS=-q 5.5 -id3v2_version 3 -c:v copy
-      - MARVYN_AUDIO_INCLUDES=*.flac,*.ogg,*.mp3
-      - MARVYN_AUDIO_EXCLUDES
+      MARVYN_FFMPEG_OUTPUT_FORMAT: "mp3"
+      MARVYN_FFMPEG_OUTPUT_OPTIONS: "-id3v2_version 3 -c:v mjpeg -vf scale='min(500,iw)':-1"
+      MARVYN_AUDIO_INCLUDES: "*.flac,*.ogg,*.mp3"
+      MARVYN_AUDIO_EXCLUDES:
