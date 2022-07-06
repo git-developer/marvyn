@@ -204,6 +204,8 @@ _Video Servies Conversion_ only.
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
 | Environment variable `MARVYN_VIDEO_BITRATE` | Video bitrate | `1280k` | `1280k` |
+| Environment variable `MARVYN_VIDEO_MAXRATE` | Maximum video bitrate | `1280k` | Video bitrate |
+| Environment variable `MARVYN_VIDEO_BUFFERSIZE` | Maximum video buffer size | `2560k` | 2x video bitrate |
 | Environment variable `MARVYN_VIDEO_CODEC` | Video format supported by VAAPI | `h264_vaapi` | `h264_vaapi` |
 | Environment variable `MARVYN_VIDEO_WIDTH` | Video width | `720` | `720` |
 | Environment variable `MARVYN_AUDIO_BITRATE` | Audio bitrate | `128k` | `128k` |
