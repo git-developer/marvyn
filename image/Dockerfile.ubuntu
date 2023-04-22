@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND
 ARG LIBDVD_DIR
 WORKDIR ${LIBDVD_DIR}
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
-      libdvd-pkg equivs && \
+      ca-certificates libdvd-pkg equivs && \
     dpkg-reconfigure -f noninteractive libdvd-pkg && \
     equivs-control libdvd-pkg && \
     version=$(apt-cache policy libdvd-pkg | grep 'Candidate:' | cut -c 14-) && \
@@ -46,7 +46,7 @@ RUN dpkg -i /tmp/libdvd/libdvd-pkg_*.deb /tmp/libdvd/libdvdcss2_*.deb && apt-mar
 COPY --from=makemkv ${MAKEMKV_DIR} /usr/local/
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
       tzdata \
-      '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
+      '^libavcodec[0-9]+$' libssl3 default-jre-headless ca-certificates-java curl libfaketime \
       dvdbackup genisoimage \
       abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
       ffmpeg libva-drm2 libva2 \
