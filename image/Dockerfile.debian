@@ -11,7 +11,8 @@ ARG LIBDVD_DIR
 ARG DISTRO
 RUN echo "deb http://deb.debian.org/debian ${DISTRO} contrib" | tee /etc/apt/sources.list.d/contrib.list
 WORKDIR ${LIBDVD_DIR}
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
+    apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y --no-install-recommends -qq \
       libdvd-pkg equivs && \
     dpkg-reconfigure -f noninteractive libdvd-pkg && \
     equivs-control libdvd-pkg && \
@@ -26,7 +27,8 @@ ARG MAKEMKV_VERSION
 ARG MAKEMKV_DIR
 ARG DEBIAN_FRONTEND
 WORKDIR /tmp
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
+    apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y --no-install-recommends -qq \
       make g++ gcc pkg-config libavcodec-dev libexpat-dev libssl-dev zlib1g-dev wget ca-certificates
 RUN MAKEMKV_VERSION=${MAKEMKV_VERSION:-$( \
       wget -q -O- 'https://www.makemkv.com/forum/viewtopic.php?f=3&t=224' \
@@ -48,7 +50,8 @@ COPY --from=libdvd "${LIBDVD_DIR}/" /tmp/libdvd/
 RUN dpkg -i /tmp/libdvd/libdvd-pkg_*.deb /tmp/libdvd/libdvdcss2_*.deb && apt-mark hold libdvd-pkg && rm -r /tmp/libdvd/
 COPY --from=makemkv ${MAKEMKV_DIR} /usr/local/
 RUN mkdir -p /usr/share/man/man1 # fix for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends -qq \
+RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
+    apt-get update && apt-get dist-upgrade -y && apt-get install --autoremove -y --no-install-recommends -qq \
       tzdata \
       '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
       dvdbackup genisoimage \
