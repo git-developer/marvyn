@@ -6,8 +6,11 @@ settings_file="${settings_dir}/settings.conf"
 property='^\s*app_Key.*$'
 
 if [ -z "${MARVYN_MAKEMKV_KEY-}" ]; then
-  if [ -n "${MARVYN_MAKEMKV_BETAKEY_URL-}" -a -n "${MARVYN_MAKEMKV_BETAKEY_PATTERN-}" ]; then
+  if [ "${MARVYN_MAKEMKV_BETAKEY_URL-}" ] && [ "${MARVYN_MAKEMKV_BETAKEY_PATTERN-}" ]; then
     MARVYN_MAKEMKV_KEY="$(curl -sSL "${MARVYN_MAKEMKV_BETAKEY_URL}" | grep -oP "${MARVYN_MAKEMKV_BETAKEY_PATTERN}" || true)"
+    if [ ! -d "${HOME}/.mc" ]; then
+      install -m 0400 /dev/null "${HOME}/.mc"
+    fi
   fi
 fi
 
