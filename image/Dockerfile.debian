@@ -11,8 +11,7 @@ ARG LIBDVD_DIR
 ARG DISTRO
 RUN echo "deb http://deb.debian.org/debian ${DISTRO} contrib" | tee /etc/apt/sources.list.d/contrib.list
 WORKDIR ${LIBDVD_DIR}
-RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
-    apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y --no-install-recommends -qq \
+RUN apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y -qq \
       libdvd-pkg equivs && \
     dpkg-reconfigure -f noninteractive libdvd-pkg && \
     equivs-control libdvd-pkg && \
@@ -27,8 +26,7 @@ ARG MAKEMKV_VERSION
 ARG MAKEMKV_DIR
 ARG DEBIAN_FRONTEND
 WORKDIR /tmp
-RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
-    apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y --no-install-recommends -qq \
+RUN apt-get update && apt-get dist-upgrade -y --autoremove && apt-get install -y --no-install-recommends -qq \
       make g++ gcc pkg-config libavcodec-dev libexpat-dev libssl-dev zlib1g-dev wget ca-certificates
 RUN MAKEMKV_VERSION=${MAKEMKV_VERSION:-$( \
       wget -q -O- 'https://www.makemkv.com/forum/viewtopic.php?f=3&t=224' \
@@ -49,16 +47,20 @@ ARG DEBIAN_FRONTEND
 COPY --from=libdvd "${LIBDVD_DIR}/" /tmp/libdvd/
 RUN dpkg -i /tmp/libdvd/libdvd-pkg_*.deb /tmp/libdvd/libdvdcss2_*.deb && apt-mark hold libdvd-pkg && rm -r /tmp/libdvd/
 COPY --from=makemkv ${MAKEMKV_DIR} /usr/local/
-RUN mkdir -p /usr/share/man/man1 # fix for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
-RUN sed -i 's:stable/updates:stable-security/updates:' /etc/apt/sources.list && \
-    apt-get update && apt-get dist-upgrade -y && apt-get install --autoremove -y --no-install-recommends -qq \
+# Workaround for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1030129
+RUN apt-get update && apt-get install -y --no-install-recommends -qq default-jre-headless ca-certificates-java
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install --autoremove -y --no-install-recommends -qq \
       tzdata \
-      '^libavcodec[0-9]+$' libssl1.1 default-jre-headless ca-certificates-java curl libfaketime \
+      '^libavcodec[0-9]+$' libssl3 default-jre-headless ca-certificates-java curl libfaketime \
       dvdbackup genisoimage \
-      abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 mkcue normalize-audio \
+      abcde vorbis-tools lame flac libmusicbrainz-discid-perl libwebservice-musicbrainz-perl glyrc imagemagick eject eyed3 normalize-audio \
       ffmpeg libva-drm2 libva2 \
       sendemail libio-socket-ssl-perl
-RUN [ "$(apt-cache search '^i965-va-driver$' | wc -l)" -eq 0 ] || apt-get install -y --no-install-recommends -qq i965-va-driver
+RUN [ "$(apt-cache search '^i965-va-driver-shaders$' | wc -l)" -eq 0 ] || apt-get install -y --no-install-recommends -qq i965-va-driver-shaders
+# mkcue is not part of bookworm
+RUN echo 'deb http://deb.debian.org/debian unstable main' >/etc/apt/sources.list.d/unstable.list && \
+    apt-get update && apt-get install mkcue && \
+    rm /etc/apt/sources.list.d/unstable.list
 COPY ./patch-abcde /tmp/patch-abcde
 RUN /tmp/patch-abcde && rm /tmp/patch-abcde
 RUN wget -q -O /usr/local/bin/dvd-duplicate-detector.pl https://www.fabiankeil.de/sourcecode/dvd-duplicate-detector.pl && \
