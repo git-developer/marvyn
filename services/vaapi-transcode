@@ -86,7 +86,7 @@ ffmpeg \
         -hwaccel_output_format vaapi \
         -filter_hw_device foo \
         -i - \
-        -map 0:v:0 -map 0:a:0 \
+        -map 0:v:0 -map 0:a:0? \
         ${language:+-map_metadata:s:a -1 -metadata:s:a "language=${language}"} \
         -vf  "format=nv12|vaapi,hwupload,scale_vaapi=w=${MARVYN_VIDEO_WIDTH}:h=-1" \
         -c:v "${MARVYN_VIDEO_CODEC}" \
