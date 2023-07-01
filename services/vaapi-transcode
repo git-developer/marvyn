@@ -13,7 +13,7 @@ find_language() {
   ffprobe_output=$(ffprobe -loglevel fatal -show_entries stream=index:stream_tags=language -select_streams a -of compact=p=0:nk=1 "${input_file}") \
     || { return_code="$?"; log "${ffprobe_output}"; return "${return_code}"; }
 
-  languages=$(printf "${ffprobe_output}" | tr \a \n | grep -oP '^\d+\|\K\w+' | sort | uniq)
+  languages=$(printf "${ffprobe_output}" | tr '\r' '\n' | grep -oP '^\d+\|\K\w+' | sort | uniq)
   if [ -z "${languages}" ]; then
     return 0
   fi
