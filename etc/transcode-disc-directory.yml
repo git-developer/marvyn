@@ -1,5 +1,4 @@
 ---
-version: "2.2"
 services:
   marvyn-transcode-disc-directory:
     extends:
