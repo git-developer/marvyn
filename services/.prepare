@@ -25,15 +25,3 @@ fi
 if [ -n "${3-}" ]; then
   work_fullpath="$(realpath -m "${3}")"
 fi
-
-if [ -n "${MARVYN_OUTPUT_INODE-}" ]; then
-  output_inode=$(stat -c %i '/output')
-  if [ "${MARVYN_OUTPUT_INODE}" -ne "${output_inode}" ]; then
-    log "Error: output directory is mounted to inode ${output_inode} instead of expected inode ${MARVYN_OUTPUT_INODE}."
-    log "       This is probably caused by https://github.com/docker/compose/issues/7270"
-    log "Workarounds:"
-    log "- simply retry, or"
-    log "- do not use command line arguments, but set your volume mounts in the configuration file 'etc/$(basename "${0}").yml'."
-    cancel
-  fi
-fi

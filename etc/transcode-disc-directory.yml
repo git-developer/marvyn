@@ -6,5 +6,3 @@ services:
       service: marvyn-vaapi-transcode
     environment:
       - MARVYN_CLEANUP
-    volumes:
-      - ../work:/work

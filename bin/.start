@@ -22,19 +22,18 @@ service_name="marvyn-${script_name}"
 container_name="${service_name}-${now}"
 
 input_basedir_container='/input'
-if [ -n "${1-}" ]; then
-  input_fullpath_host=$(realpath "${1}")
-  [ -e "${input_fullpath_host}" ] || cancel "Error: input '${1}' does not exist."
-  case "${input_fullpath_host}" in
-    /dev/*) input_fullpath_container="${input_fullpath_host}"
-            ;;
-    *)      input_host=$(dirname "${input_fullpath_host}")
-            input_filename=$(basename "${input_fullpath_host}")
-            input_fullpath_container="${input_basedir_container}/${input_filename}"
-            export MARVYN_INPUT_INODE=$(stat -c %i "${input_host}")
-            ;;
-  esac
+input_fullpath_host=$(realpath "${1}")
+if [ ! -e "${input_fullpath_host}" ]; then
+  cancel "Error: input '${1}' does not exist."
 fi
+case "${input_fullpath_host}" in
+  /dev/*) input_fullpath_container="${input_fullpath_host}"
+          ;;
+  *)      input_host=$(dirname "${input_fullpath_host}")
+          input_filename=$(basename "${input_fullpath_host}")
+          input_fullpath_container="${input_basedir_container}/${input_filename}"
+          ;;
+esac
 
 output_basedir_container='/output'
 if [ -n "${2-}" ]; then
@@ -48,23 +47,25 @@ if [ -n "${2-}" ]; then
     output_host="${output_basedir_host}"
     output_fullpath_container="${output_basedir_container}/${output_filename}"
   fi
-  # create output directory with user permissions
-  mkdir -p "${output_host}"
-  export MARVYN_OUTPUT_INODE=$(stat -c %i "${output_host}")
 else
+  output_fullpath_host="$(realpath -m "${MARVYN_OUTPUT_DIRECTORY:-${home_dir}/output}")"
+  output_host="${output_fullpath_host}"
   output_fullpath_container="${output_basedir_container}${input_filename:+/${input_filename}}"
 fi
+# create output directory with user permissions
+mkdir -p "${output_host}"
 
 work_basedir_container='/work'
 if [ -n "${3-}" ]; then
   work_host="$(realpath -m "${3}")"
   work_fullpath_container="${work_basedir_container}"
-  # create work directory with user permissions
-  mkdir -p "${work_host}"
-  export MARVYN_WORK_INODE=$(stat -c %i "${work_host}")
 else
+  work_fullpath_host="$(realpath -m "${MARVYN_WORK_DIRECTORY:-${home_dir}/work}")"
+  work_host="${work_fullpath_host}"
   work_fullpath_container="${work_basedir_container}${input_filename:+/${input_filename}}"
 fi
+# create work directory with user permissions
+mkdir -p "${work_host}"
 
 # Inject environment variables prefixed with MARVYN_ into the container
 env_variables=$(set | grep -oP '^MARVYN_\w+(?==.*$)' | while IFS= read -r var; do printf " -e ${var}"; done)
@@ -79,11 +80,11 @@ exec "${docker_compose}" "--file=${compose_file}" run \
   "--user=${user}" \
   "-d" \
   ${input_host:+"--volume=${input_host}:${input_basedir_container}:ro"} \
-  ${output_host:+"--volume=${output_host}:${output_basedir_container}:rw"} \
-  ${work_host:+"--volume=${work_host}:${work_basedir_container}:rw"} \
+  "--volume=${output_host}:${output_basedir_container}:rw" \
+  "--volume=${work_host}:${work_basedir_container}:rw" \
   ${env_variables:+${env_variables}} \
   "${service_name}" \
   "${script_dir_container}/${script_name}" \
-  ${input_fullpath_container:+"${input_fullpath_container}"} \
-  ${output_fullpath_container:+"${output_fullpath_container}"} \
-  ${work_fullpath_container:+"${work_fullpath_container}"}
+  "${input_fullpath_container}" \
+  "${output_fullpath_container}" \
+  "${work_fullpath_container}"

@@ -111,7 +111,6 @@ Video conversion uses hardware transcoding.
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
-| Volume Mount `/output` | Output directory | `/media/newstuff:/output` | `../output:/output` |
 | Environment variable `MARVYN_MAKEMKV_KEY` | MakeMKV [registration key](https://www.makemkv.com/buy/). When unset, a beta key is downloaded and used.  | `T-wN2...AE5z` | _none_ |
 | Environment variable `MARVYN_NICENESS` | CPU priority (in terms of the `nice` command) | `-19`..`20` | _none_ (effectively: Default of `nice` command)
 | Environment variable `TZ` | Timezone | `Europe/Berlin` | _none_ |
@@ -168,7 +167,6 @@ documentation for details.
 
 | Option | Description | Examples | Default |
 | -----  | ----------- | -------- | ------- |
-| Volume Mount `/work` | Working directory for temporary files | `/tmp/transcoding:/work` | `../work:/work` |
 | Environment variable `MARVYN_CLEANUP` | Delete temporary files after successful finish? | `yes`, `no` | `yes` |
 
 This configuration uses the _Video Transcoding_ configuration as default.
@@ -260,18 +258,33 @@ For all other variables, the default `docker-compose` behavior is applied:
 * if a variable is declared in the configuration file with value,
   this value is used and the environment value is ignored.
 
-### Directories for output and work as command line arguments
-By default, the directories for `/output` and `/work` are read from the
-configuration file. Alternatively, it is possible to hand them over as command
-line arguments to a service, e.g.
-
-* `$ bin/transcode-disc-directory /media/input.mp4 /media/output/`
-* `$ bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/`
-
-Unfortunately, this does not work reliably as long as
-[docker-compose #7270](https://github.com/docker/compose/issues/7270)
-is open: either the command line argument or the configuration file value
-will be chosen randomly. MARVYN knows this bug and will cancel when detected.
+### Configuration of output and work directories
+By default, the directories for `output` and `work` are located in the root
+directory of the installation (on the same level as `bin` and `etc`).
+If that's not appropriate, you have the choice to:
+1. Hand them over as command line arguments to a service:
+    ```console
+    $ bin/transcode-disc-directory /media/input.mp4 /media/output/
+    $ bin/transcode-disc-directory /media/input.mp4 /media/output/ /tmp/work/
+    ```
+2. Set environment variables to change the location:
+    ```console
+    $ export MARVYN_OUTPUT_DIRECTORY=/media/output/
+    $ export MARVYN_WORK_DIRECTORY=/tmp/work/
+    $ bin/transcode-disc-directory /media/input.mp4
+    ```
+3. Use symlinks to redirect them to a different location:
+    ```console
+    $ ln -s /media/output output
+    $ ln -s /tmp/work work
+    $ bin/transcode-disc-directory /media/input.mp4
+    ```
+4. Use bind mounts to mount them to a different location:
+    ```console
+    $ sudo mount --bind /media/output output
+    $ sudo mount --bind /tmp/work work
+    $ bin/transcode-disc-directory /media/input.mp4
+    ```
 
 ### Users, groups and permissions
 MARVYN services run with userid and groupid of the current user.

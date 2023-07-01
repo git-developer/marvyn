@@ -7,7 +7,6 @@ services:
     volumes:
       - ../services:/opt/marvyn:ro
       - ../data:/home/marvyn
-      - ../output:/output
     environment:
       - HOME=/home/marvyn
       - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
